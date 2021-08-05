@@ -20,7 +20,7 @@ Please cite package using the BibTeX entry, which is obtained by the call ``cita
 * [stm](https://www.structuraltopicmodel.com/) is a framework for Structural Topic Models.
 * [tosca](https://github.com/Docma-TU/tosca) is a framework for statistical methods in content analysis including visualizations and validation techniques. It is also useful for managing and manipulating text data to a structure requested by ``ldaPrototype``.
 * [topicmodels](https://CRAN.R-project.org/package=topicmodels) is another framework for various topic models based on the Latent Dirichlet Allocation and Correlated Topics Models.
-* dtm/cdtm
+* [dtm/cdtm](https://github.com/blei-lab/dtm)
 * Streaming-LDA: A Copula-based Approach to Modeling Topic Dependencies in Document Streams [link](https://dl.acm.org/doi/10.1145/2939672.2939781)
 * Online Learning for Latent Dirichlet Allocation [link](https://papers.nips.cc/paper/2010/hash/71f6278d140af599e06ad9bf1ba03cb0-Abstract.html)
 * A time-dependent topic model for multiple text streams [link](https://www.researchgate.net/publication/221653916_A_time-dependent_topic_model_for_multiple_text_streams)
