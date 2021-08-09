@@ -19,15 +19,14 @@ Imports:
 	dendextend,
 	fs (>= 1.2.0),
 	future,
-	lda (>= 1.4.2),
+	ldaPrototype (>= 0.3.0),
 	parallelMap,
 	progress (>= 1.1.1),
 	stats,
+	tosca (>= 0.2-0),
 	utils
 Suggests:
-	ldaPrototype,
 	RColorBrewer (>= 1.1-2),
-	testthat,
-	tosca
+	testthat
 RoxygenNote: 7.1.1
 LazyData: true
