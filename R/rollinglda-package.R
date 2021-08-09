@@ -20,4 +20,5 @@
 #' @import data.table
 #' @import stats
 #' @import checkmate
+#' @import ldaPrototype
 "_PACKAGE"

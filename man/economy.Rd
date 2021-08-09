@@ -3,13 +3,13 @@
 \docType{data}
 \name{economy}
 \alias{economy}
-\alias{economy_text}
+\alias{economy_texts}
 \alias{economy_dates}
-\alias{text}
+\alias{texts}
 \alias{dates}
 \title{A Snippet of the Economy Dataset from toscaData}
 \format{
-\code{economy_text} is a list of tokenized texts of length 576.
+\code{economy_texts} is a named list of tokenized texts of length 576.
 
 \code{economy_dates} is
 
@@ -19,7 +19,7 @@ An object of class \code{Date} of length 576.
 \url{https://github.com/Docma-TU/toscaData}
 }
 \usage{
-data(economy_text)
+data(economy_texts)
 
 data(economy_dates)
 }
