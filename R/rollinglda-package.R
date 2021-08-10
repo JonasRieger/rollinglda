@@ -21,4 +21,6 @@
 #' @import stats
 #' @import checkmate
 #' @import ldaPrototype
+#' @import lubridate
+#' @import tosca
 "_PACKAGE"
