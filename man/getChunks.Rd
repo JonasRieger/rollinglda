@@ -14,9 +14,9 @@ getChunks(x)
 
 getNames(x)
 
-getDates(x, names)
+getDates(x, names, inverse)
 
-getDocs(x, names)
+getDocs(x, names, inverse)
 
 \method{getLDA}{RollingLDA}(x, job, reduce, all)
 
@@ -29,7 +29,10 @@ getDocs(x, names)
 \code{\link{RollingLDA}} object.}
 
 \item{names}{[\code{character}]\cr
-Names of the requested items (dates or docs).}
+Names of the requested items (dates or docs). Default are all names.}
+
+\item{inverse}{[\code{logical(1)}]\cr
+Should all items except those with the given names be returned? Default is \code{FALSE}.}
 
 \item{job}{not implemented for \code{\link{RollingLDA}} object.
 See \code{\link[ldaPrototype:getSCLOP]{getLDA}}}
@@ -41,5 +44,5 @@ See \code{\link[ldaPrototype:getSCLOP]{getLDA}}}
 See \code{\link[ldaPrototype:getSCLOP]{getLDA}}}
 }
 \description{
-bla
+TBA
 }

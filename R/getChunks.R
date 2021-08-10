@@ -1,6 +1,6 @@
 #' @title Getter for RollingLDA
 #'
-#' @description bla
+#' @description TBA
 #'
 #' @param x [\code{named list}]\cr
 #' \code{\link{RollingLDA}} object.
@@ -38,8 +38,10 @@ getDates = function(x, names, inverse) UseMethod("getDates")
 
 #' @export
 getDates.RollingLDA = function(x, names, inverse = FALSE){
+  assert_flag(inverse)
   if (missing(names)) names = getNames(x)
   assert_character(names, any.missing = FALSE, min.len = 1)
+  if (inverse) names = setdiff(getNames(x), names)
   x$dates[na.omit(match(names, names(x$dates)))]
 }
 
@@ -49,8 +51,10 @@ getDocs = function(x, names, inverse) UseMethod("getDocs")
 
 #' @export
 getDocs.RollingLDA = function(x, names, inverse = FALSE){
+  assert_flag(inverse)
   if (missing(names)) names = getNames(x)
   assert_character(names, any.missing = FALSE, min.len = 1)
+  if (inverse) names = setdiff(getNames(x), names)
   x$docs[na.omit(match(names, names(x$docs)))]
 }
 

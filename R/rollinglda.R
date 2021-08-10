@@ -3,9 +3,6 @@
 # texts muss named list of tokenized texts sein!!!
 # dates muss gleiche Länge und Sortierung (wie texts) haben, oder benannt sein!
 
-#getDocs muss noch geschrieben werden!
-#getDates auch!
-
 # texts = named list of tokenized texts
 # dates = dates (benannt oder unbenannt - bei letzterem aber dann gleiche Sortierung)
 # chunks = entweder date oder in der Form "ZahlUnit" = beginn jedes chunks
