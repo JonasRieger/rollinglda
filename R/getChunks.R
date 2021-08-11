@@ -63,7 +63,7 @@ getDocs.RollingLDA = function(x, names, inverse = FALSE){
 getVocab = function(x) UseMethod("getDocs")
 
 #' @export
-getDocs.RollingLDA = function(x){
+getVocab.RollingLDA = function(x){
   x$vocab
 }
 
