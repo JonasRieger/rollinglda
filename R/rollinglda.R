@@ -59,7 +59,7 @@ rollinglda = function(texts, dates, chunks, memory,
 
   # LDARep / LDAPrototype
   if (type == "ldaprototype"){
-    lda = getLDA(LDAPrototype(docs = docs, vocab = vocab, ...))
+    lda = getLDA(LDAPrototype(docs = docs, vocabLDA = vocab, ...))
   }
   if (type == "lda"){
     lda = getLDA(LDARep(docs = docs, vocab = vocab, n = 1, ...))
