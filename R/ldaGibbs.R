@@ -2,7 +2,6 @@ ldaGibbs = function(docs, K, vocab, num.iterations, alpha, eta, initial = NULL,
                      burnin = 0L, compute.log.likelihood = FALSE, trace = 0L,
                      freeze.topics = FALSE, n.init = 0L){
   message("ldaGibbs")
-  message("K=", K)
   lengths = as.integer(length(vocab))
   retval = structure(
     .Call("ldagibbs", docs, as.integer(K), lengths, as.integer(num.iterations),
@@ -11,6 +10,7 @@ ldaGibbs = function(docs, K, vocab, num.iterations, alpha, eta, initial = NULL,
           as.integer(n.init)),
     names = c("assignments", "topics", "topic_sums", "document_sums",
               "document_expects", "log.likelihoods"))
+  message("OK")
   colnames(retval$topics) = vocab
   retval
 }

@@ -102,6 +102,7 @@ rollinglda = function(texts, dates, chunks, memory,
   res$lda$topics = compute_topics_matrix_from_assignments(
     assignments = getAssignments(getLDA(res)),
     docs = getDocs(res),
+    K = getK(getLDA(res)),
     vocab = getVocab(res))
   invisible(res)
 }
@@ -173,21 +174,19 @@ rollinglda_update = function(x, texts, dates, memory, param = getParam(x)){
     vocab.fallback = vocab.fallback,
     doc.abs = doc.abs
   )
-  dates = dates[match(names(step.new$docs), names(dates))]
-  dates = c(getDates(x, names = id.memory, inverse = TRUE), dates)
-  #if (!keep.docs) docs = step.new$docs
-  #else
-  docs = append(getDocs(x, names = id.memory, inverse = TRUE), step.new$docs)
-  chunks = merge.data.table(chunks, data.table(
-    chunk.id = max(chunks$chunk.id) + 1L,
+  chunks = merge.data.table(getChunks(x), data.table(
+    chunk.id = max(getChunks(x)$chunk.id) + 1L,
     start.date = min(dates),
     end.date = max(dates),
     memory = memory,
-    n = step.new$n.docs,
+    n = step.new$n.docs.new,
     n.discarded = step.new$n.docs.deleted,
     n.memory = n.memory,
     n.vocab = length(step.new$vocab)
   ), all = TRUE)
+  dates = dates[na.omit(match(names(step.new$docs), names(dates)))]
+  dates = c(getDates(x, names = id.memory, inverse = TRUE), dates)
+  docs = append(getDocs(x, names = id.memory, inverse = TRUE), step.new$docs)
   res = list(id = getID(x), lda = step.new$lda,
              docs = docs, dates = dates, vocab = step.new$vocab, chunks = chunks,
              param = list(vocab.abs = vocab.abs, vocab.rel = vocab.rel,
@@ -229,7 +228,7 @@ rollinglda_one_step = function(lda, docs, texts, vocab,
     lda = LDA(
       assignments = append(getAssignments(lda), res$assignments),
       document_sums = cbind(getDocument_sums(lda), res$document_sums),
-      param = list(K = K, alpha = alpha, eta = eta, num.iterations = num.iterations)
+      param = getParam(lda)
     ),
     docs = docs,
     vocab = vocab,
