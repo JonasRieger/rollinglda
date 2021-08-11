@@ -210,7 +210,7 @@ rollinglda_one_step = function(lda, docs, texts, vocab,
     as.integer(sample(getK(lda), n, replace = TRUE)-1))
 
   res = rollinglda_one_step_fitting(
-    assignments = append(tail(getAssignments(lda), n.init), assignments.new.sampled),
+    assignments = append(tail(getAssignments(lda), n.memory), assignments.new.sampled),
     docs = docs,
     vocab = vocab,
     n.init = n.memory,
