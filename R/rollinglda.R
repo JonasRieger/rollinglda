@@ -57,11 +57,12 @@ rollinglda = function(texts, dates, chunks, memory,
   docs = LDAprep(texts[dates < chunks[1]], vocab)
   docs = docs[sapply(docs, ncol) > doc.abs]
 
-  # LDARep / LDAPrototype
   if (type == "ldaprototype"){
+    message("Fitting LDAPrototype as initial model.")
     lda = getLDA(LDAPrototype(docs = docs, vocabLDA = vocab, ...))
   }
   if (type == "lda"){
+    message("Fitting LDA as initial model.")
     lda = getLDA(LDARep(docs = docs, vocab = vocab, n = 1, ...))
   }
 
@@ -76,6 +77,7 @@ rollinglda = function(texts, dates, chunks, memory,
                n.memory = NA_integer_,
                n.vocab = length(vocab)
              ),
+             vocab = vocab,
              param = list(vocab.abs = vocab.abs, vocab.rel = vocab.rel,
                           vocab.fallback = vocab.fallback, doc.abs = doc.abs))
   class(res) = "RollingLDA"
@@ -86,6 +88,7 @@ rollinglda = function(texts, dates, chunks, memory,
 
   # rollinglda_update
   for (i in seq_along(chunks)){
+    message("Fitting Chunk ", i, "/", length(chunks), ".")
     res = rollinglda_update(
       x = res,
       texts = texts[dates < chunks[i]],
