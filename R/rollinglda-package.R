@@ -23,4 +23,5 @@
 #' @import ldaPrototype
 #' @import lubridate
 #' @import tosca
+#' @useDynLib rollinglda, .registration=TRUE
 "_PACKAGE"
