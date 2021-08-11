@@ -51,7 +51,7 @@ rollinglda = function(texts, dates, chunks, memory,
   assert_date(memory, any.missing = FALSE, len = length(chunks))
 
   init = max(dates[dates < chunks[1]])
-  wc = .computewordcounts(texts.init)
+  wc = .computewordcounts(texts[dates < chunks[1]])
   vocab = wc$words[wc$wordcounts > vocab.abs &
                      wc$wordcounts > min(vocab.rel * sum(wc$wordcounts), vocab.fallback)]
   docs = LDAprep(texts[dates < chunks[1]], vocab)
