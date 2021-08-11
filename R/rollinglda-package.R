@@ -20,8 +20,8 @@
 #' @import data.table
 #' @import stats
 #' @import checkmate
+#' @import tosca
 #' @import ldaPrototype
 #' @import lubridate
-#' @import tosca
 #' @useDynLib rollinglda, .registration=TRUE
 "_PACKAGE"

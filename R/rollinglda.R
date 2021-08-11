@@ -66,7 +66,8 @@ rollinglda = function(texts, dates, chunks, memory,
     lda = getLDA(LDARep(docs = docs, vocab = vocab, n = 1, ...))
   }
 
-  res = list(id = id, lda = lda, docs = docs, dates = dates[dates < chunks[1]],
+  res = list(id = id, lda = lda,
+             docs = docs, dates = dates[dates < chunks[1]], vocab = vocab,
              chunks = data.table(
                chunk.id = 0L,
                start.date = min(dates),
@@ -77,7 +78,6 @@ rollinglda = function(texts, dates, chunks, memory,
                n.memory = NA_integer_,
                n.vocab = length(vocab)
              ),
-             vocab = vocab,
              param = list(vocab.abs = vocab.abs, vocab.rel = vocab.rel,
                           vocab.fallback = vocab.fallback, doc.abs = doc.abs))
   class(res) = "RollingLDA"
@@ -98,6 +98,11 @@ rollinglda = function(texts, dates, chunks, memory,
     texts = texts[dates >= chunks[i]]
     dates = dates[dates >= chunks[i]]
   }
+  message("Compute topic matrix.")
+  res$lda$topics = compute_topics_matrix_from_assignments(
+    assignments = getAssignments(getLDA(res)),
+    docs = getDocs(res),
+    vocab = getVocab(res))
   invisible(res)
 }
 
@@ -170,8 +175,9 @@ rollinglda_update = function(x, texts, dates, memory, param = getParam(x)){
   )
   dates = dates[match(names(step.new$docs), names(dates))]
   dates = c(getDates(x, names = id.memory, inverse = TRUE), dates)
-  if (!keep.docs) docs = step.new$docs
-  else docs = append(getDocs(x, names = id.memory, inverse = TRUE), step.new$docs)
+  #if (!keep.docs) docs = step.new$docs
+  #else
+  docs = append(getDocs(x, names = id.memory, inverse = TRUE), step.new$docs)
   chunks = merge.data.table(chunks, data.table(
     chunk.id = max(chunks$chunk.id) + 1L,
     start.date = min(dates),
@@ -183,7 +189,7 @@ rollinglda_update = function(x, texts, dates, memory, param = getParam(x)){
     n.vocab = length(step.new$vocab)
   ), all = TRUE)
   res = list(id = getID(x), lda = step.new$lda,
-             docs = docs, dates = dates, chunks = chunks, vocab = step.new$vocab,
+             docs = docs, dates = dates, vocab = step.new$vocab, chunks = chunks,
              param = list(vocab.abs = vocab.abs, vocab.rel = vocab.rel,
                           vocab.fallback = vocab.fallback, doc.abs = doc.abs))
   class(res) = "RollingLDA"
@@ -237,7 +243,7 @@ rollinglda_one_step_fitting = function(assignments, docs, vocab, n.init,
                                        K, alpha, eta, num.iterations){
 
   topics = compute_topics_matrix_from_assignments(assignments, docs, K, vocab)
-  res = ldaGibbs(docs = docs, K = K, vocab,
+  res = ldaGibbs(docs = docs, K = K, vocab = vocab,
                  num.iterations = num.iterations, alpha = alpha, eta = eta,
                  initial = list(
                    assignments = assignments,
