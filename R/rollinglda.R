@@ -199,7 +199,7 @@ rollinglda_update = function(x, texts, dates, memory, param = getParam(x)){
 # internal
 rollinglda_one_step = function(lda, docs, texts, vocab,
                                vocab.abs = 5, vocab.rel = 0, vocab.fallback = 100, doc.abs = 0){
-
+  message("rollinglda_one_step")
   wc = .computewordcounts(texts)
   vocab.new = wc$words[wc$wordcounts > vocab.abs &
                          wc$wordcounts > min(vocab.rel * sum(wc$wordcounts), vocab.fallback)]
@@ -241,7 +241,7 @@ rollinglda_one_step = function(lda, docs, texts, vocab,
 # internal
 rollinglda_one_step_fitting = function(assignments, docs, vocab, n.init,
                                        K, alpha, eta, num.iterations){
-
+  message("rollinglda_one_step_fitting")
   topics = compute_topics_matrix_from_assignments(assignments, docs, K, vocab)
   res = ldaGibbs(docs = docs, K = K, vocab = vocab,
                  num.iterations = num.iterations, alpha = alpha, eta = eta,
@@ -259,6 +259,7 @@ rollinglda_one_step_fitting = function(assignments, docs, vocab, n.init,
 
 # internal
 compute_topics_matrix_from_assignments = function(assignments, docs, K, vocab){
+  message("compute_topics_matrix_from_assignments")
   n.voc = length(vocab)
   assignments_flatten = unlist(assignments) + 1
   docs_flatten = unlist(lapply(docs, function(x) x[1,])) + 1
