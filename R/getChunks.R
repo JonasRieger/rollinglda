@@ -60,7 +60,7 @@ getDocs.RollingLDA = function(x, names, inverse = FALSE){
 
 #' @rdname getChunks
 #' @export getVocab
-getVocab = function(x) UseMethod("getDocs")
+getVocab = function(x) UseMethod("getVocab")
 
 #' @export
 getVocab.RollingLDA = function(x){
