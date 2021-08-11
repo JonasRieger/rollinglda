@@ -149,7 +149,7 @@ rollinglda_update = function(x, texts, dates, memory, param = getParam(x)){
   vocab.abs = param$vocab.abs
   vocab.rel = param$vocab.rel
   vocab.fallback = param$vocab.fallback
-  docs.abs = param$docs.abs
+  doc.abs = param$doc.abs
 
   dates.memory = getDates(x)
   id.memory = names(dates.memory[dates.memory >= memory])
