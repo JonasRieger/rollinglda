@@ -5,6 +5,7 @@
 \alias{getNames}
 \alias{getDates}
 \alias{getDocs}
+\alias{getVocab}
 \alias{getLDA.RollingLDA}
 \alias{getID.RollingLDA}
 \alias{getParam.RollingLDA}
@@ -17,6 +18,8 @@ getNames(x)
 getDates(x, names, inverse)
 
 getDocs(x, names, inverse)
+
+getVocab(x)
 
 \method{getLDA}{RollingLDA}(x, job, reduce, all)
 

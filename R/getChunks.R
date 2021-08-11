@@ -59,6 +59,15 @@ getDocs.RollingLDA = function(x, names, inverse = FALSE){
 }
 
 #' @rdname getChunks
+#' @export getVocab
+getVocab = function(x) UseMethod("getDocs")
+
+#' @export
+getDocs.RollingLDA = function(x){
+  x$vocab
+}
+
+#' @rdname getChunks
 #' @export
 getLDA.RollingLDA = function(x, job, reduce, all){
   x$lda
