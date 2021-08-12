@@ -10,7 +10,8 @@ BugReports: https://github.com/JonasRieger/rollinglda/issues
 License: GPL (>= 3)
 Encoding: UTF-8
 Depends:
-	R (>= 4.0.0)
+	R (>= 4.0.0),
+	ldaPrototype (>= 0.3.0)
 Imports:
 	batchtools (>= 0.9.11),
 	checkmate (>= 1.8.5),
@@ -19,7 +20,6 @@ Imports:
 	dendextend,
 	fs (>= 1.2.0),
 	future,
-	ldaPrototype (>= 0.3.0),
 	parallelMap,
 	progress (>= 1.1.1),
 	stats,

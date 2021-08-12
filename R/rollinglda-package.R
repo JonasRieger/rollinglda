@@ -20,8 +20,10 @@
 #' @import data.table
 #' @import stats
 #' @import checkmate
-#' @import tosca
+#' @importFrom tosca LDAprep
 #' @import ldaPrototype
-#' @import lubridate
+#' @importFrom lubridate is.Date
+#' @importFrom lubridate NA_Date_
+#' @importFrom lubridate period
 #' @useDynLib rollinglda, .registration=TRUE
 "_PACKAGE"

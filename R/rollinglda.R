@@ -88,7 +88,7 @@ RollingLDA.default = function(texts, dates, chunks, memory,
   vocab.abs = 5, vocab.rel = 0, vocab.fallback = 100, doc.abs = 0,
   init, type = c("ldaprototype", "lda"), id, ...){
 
-  type = match.arg(tolower(type))
+  type = match.arg(type)
   if (missing(id)) id = paste0("rolling-", type)
 
   if (is.null(names(dates))) names(dates) = names(texts)
