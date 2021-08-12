@@ -161,5 +161,6 @@ updateRollingLDA.RollingLDA = function(x, texts, dates, memory, param = getParam
   invisible(res)
 }
 
+#' @rdname updateRollingLDA
 #' @export
 RollingLDA.RollingLDA = updateRollingLDA.RollingLDA

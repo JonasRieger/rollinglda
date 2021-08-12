@@ -3,6 +3,7 @@
 \name{updateRollingLDA}
 \alias{updateRollingLDA}
 \alias{updateRollingLDA.RollingLDA}
+\alias{RollingLDA.RollingLDA}
 \title{Updating an existing RollingLDA object}
 \usage{
 updateRollingLDA(...)
@@ -15,6 +16,8 @@ updateRollingLDA(...)
   param = getParam(x),
   compute.topics = TRUE
 )
+
+\method{RollingLDA}{RollingLDA}(x, texts, dates, memory, param = getParam(x), compute.topics = TRUE)
 }
 \arguments{
 \item{...}{additional arguments.}
@@ -88,7 +91,7 @@ The function returns a \code{\link{RollingLDA}} object. You can receive results 
 all other elements of this object with getter functions (see \code{\link{getChunks}}).
 }
 \seealso{
-Other RollingLDA functions: 
+Other RollingLDA functions:
 \code{\link{RollingLDA}()},
 \code{\link{as.RollingLDA}()},
 \code{\link{getChunks}()}
