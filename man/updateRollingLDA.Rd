@@ -91,7 +91,7 @@ The function returns a \code{\link{RollingLDA}} object. You can receive results 
 all other elements of this object with getter functions (see \code{\link{getChunks}}).
 }
 \seealso{
-Other RollingLDA functions:
+Other RollingLDA functions: 
 \code{\link{RollingLDA}()},
 \code{\link{as.RollingLDA}()},
 \code{\link{getChunks}()}

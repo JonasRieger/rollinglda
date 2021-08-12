@@ -73,7 +73,16 @@ updateRollingLDA.RollingLDA = function(x, texts, dates, memory, param = getParam
   compute.topics = TRUE){
 
   # assert auf x!
+  vocab.abs = param$vocab.abs
+  vocab.rel = param$vocab.rel
+  vocab.fallback = param$vocab.fallback
+  doc.abs = param$doc.abs
+  assert_int(vocab.abs, lower = 0)
+  assert_int(vocab.rel, lower = 0, upper = 1)
+  assert_int(vocab.fallback, lower = 0)
+  assert_int(doc.abs, lower = 0)
   assert_list(texts, types = "character", names = "unique")
+
   if (is.null(names(dates))) names(dates) = names(texts)
   dates = dates[match(names(dates), names(texts))]
   assert_date(try(as.Date(dates)), any.missing = FALSE, len = length(texts))
@@ -110,18 +119,11 @@ updateRollingLDA.RollingLDA = function(x, texts, dates, memory, param = getParam
     }else memory = memory.try
   }
   assert_date(memory, any.missing = FALSE, len = 1)
-  # assert auf param!
-  vocab.abs = param$vocab.abs
-  vocab.rel = param$vocab.rel
-  vocab.fallback = param$vocab.fallback
-  doc.abs = param$doc.abs
 
   dates.memory = getDates(x)
   id.memory = names(dates.memory[dates.memory >= memory])
   docs.memory = getDocs(x, names = id.memory)
   n.memory = length(docs.memory)
-
-  # message("Verwende Texte ab ", memory, " als memory (", n.init, ")")
 
   step.new = rollinglda_one_step(
     lda = getLDA(x),

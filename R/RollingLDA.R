@@ -34,19 +34,19 @@
 #' An absolute lower bound limit for which words are taken into account. All
 #' words are considered in the vocabularies that have a count higher than
 #' \code{vocab.abs} over all texts and at the same time a higher relative
-#' frequency than \code{vocab.rel}.
+#' frequency than \code{vocab.rel}. Default is 5.
 #' @param vocab.rel [0,1]\cr
 #' A relative lower bound limit for which words are taken into account. See also
-#' \code{vocab.abs}.
+#' \code{vocab.abs}. Default is 0.
 #' @param vocab.fallback [\code{integer(1)}]\cr
 #' An absolute lower bound limit for which words are taken into account. All
 #' words are considered in the vocabularies that have a count higher than
 #' \code{vocab.fallback} over all texts even if they might not have a higher
-#' relative frequency than \code{vocab.rel}.
+#' relative frequency than \code{vocab.rel}. Default is 100.
 #' @param doc.abs [\code{integer(1)}]\cr
 #' An absolute lower bound limit for which texts are taken into account. All
 #' texts are considered for modeling that have more words (subsetted to words
-#' occurring in the vocabularies) than \code{doc.abs}.
+#' occurring in the vocabularies) than \code{doc.abs}. Default is 0.
 #' @param init [\code{Date(1)} or \code{integer(1)}]\cr
 #' Date up to which the initial model should be computed. This parameter is
 #' needed/used only if \code{chunks} is passed as \code{character}. Otherwise
@@ -88,8 +88,15 @@ RollingLDA.default = function(texts, dates, chunks, memory,
   vocab.abs = 5, vocab.rel = 0, vocab.fallback = 100, doc.abs = 0,
   init, type = c("ldaprototype", "lda"), id, ...){
 
+  assert_int(vocab.abs, lower = 0)
+  assert_int(vocab.rel, lower = 0, upper = 1)
+  assert_int(vocab.fallback, lower = 0)
+  assert_int(doc.abs, lower = 0)
+  assert_list(texts, types = "character", names = "unique")
+
   type = match.arg(type)
   if (missing(id)) id = paste0("rolling-", type)
+  assert_character(id, any.missing = FALSE, len = 1)
 
   if (is.null(names(dates))) names(dates) = names(texts)
   dates = dates[match(names(dates), names(texts))]

@@ -53,22 +53,22 @@ modeled texts chronologically and taking the date of the text at position
 An absolute lower bound limit for which words are taken into account. All
 words are considered in the vocabularies that have a count higher than
 \code{vocab.abs} over all texts and at the same time a higher relative
-frequency than \code{vocab.rel}.}
+frequency than \code{vocab.rel}. Default is 5.}
 
 \item{vocab.rel}{[0,1]\cr
 A relative lower bound limit for which words are taken into account. See also
-\code{vocab.abs}.}
+\code{vocab.abs}. Default is 0.}
 
 \item{vocab.fallback}{[\code{integer(1)}]\cr
 An absolute lower bound limit for which words are taken into account. All
 words are considered in the vocabularies that have a count higher than
 \code{vocab.fallback} over all texts even if they might not have a higher
-relative frequency than \code{vocab.rel}.}
+relative frequency than \code{vocab.rel}. Default is 100.}
 
 \item{doc.abs}{[\code{integer(1)}]\cr
 An absolute lower bound limit for which texts are taken into account. All
 texts are considered for modeling that have more words (subsetted to words
-occurring in the vocabularies) than \code{doc.abs}.}
+occurring in the vocabularies) than \code{doc.abs}. Default is 0.}
 
 \item{init}{[\code{Date(1)} or \code{integer(1)}]\cr
 Date up to which the initial model should be computed. This parameter is
