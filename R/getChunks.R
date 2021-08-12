@@ -14,6 +14,8 @@
 #' See \code{\link[ldaPrototype:getSCLOP]{getLDA}}
 #' @param all not implemented for \code{\link{RollingLDA}} object.
 #' See \code{\link[ldaPrototype:getSCLOP]{getLDA}}
+#'
+#' @family RollingLDA functions
 
 #' @export getChunks
 getChunks = function(x) UseMethod("getChunks")

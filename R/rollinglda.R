@@ -1,21 +1,94 @@
-#RollingLDA_update.RollingLDA = function(x, texts, dates, compute.topics = TRUE)
+#' @title RollingLDA
+#'
+#' @description
+#' Performs a rolling version of Latent Dirichlet Allocation.
+#'
+#' @details The function first computes a initial LDA model (using
+#' \code{\link[ldaPrototype]{LDARep}} or \code{\link[ldaPrototype]{LDAPrototype}}).
+#' Afterwards it models temporal chunks of texts with a specified memory for
+#' initialization of each model chunk.
+#'
+#' The function returns a \code{RollingLDA} object. You can receive results and
+#' all other elements of this object with getter functions (see \code{\link{getChunks}}).
+#'
+#' @family RollingLDA functions
+#'
+#' @param texts [\code{named list}]\cr
+#' Tokenized texts.
+#' @param dates [\code{(un)named Date}]\cr
+#' Dates of the tokenized texts. If unnamed, it must match the order of texts.
+#' @param chunks [\code{Date} or \code{character(1)}]\cr
+#' Dates of the beginnings of each chunk to be modeled after the inital model.
+#' If passed as \code{character}, dates are determined by passing \code{init}
+#' plus one day as \code{from} argument, \code{max(dates)} as \code{to} argument
+#' and \code{chunks} as \code{by} argument in \code{\link{seq.Date}}.
+#' @param memory [\code{Date}, \code{character(1)} or \code{integer(1)}]\cr
+#' Dates of the beginnings of each chunk's memory. If passed as \code{character},
+#' dates are determined by using the dates of the beginnings of each chunk and
+#' substracting the given time interval in \code{memory} passing it as
+#' \code{by} argument in \code{\link{seq.Date}}. If passed as
+#' \code{integer/numeric}, the dates are determined by going backwards the
+#' modeled texts chronologically and taking the date of the text at position
+#' \code{memory}.
+#' @param vocab.abs [\code{integer(1)}]\cr
+#' An absolute lower bound limit for which words are taken into account. All
+#' words are considered in the vocabularies that have a count higher than
+#' \code{vocab.abs} over all texts and at the same time a higher relative
+#' frequency than \code{vocab.rel}.
+#' @param vocab.rel [0,1]\cr
+#' A relative lower bound limit for which words are taken into account. See also
+#' \code{vocab.abs}.
+#' @param vocab.fallback [\code{integer(1)}]\cr
+#' An absolute lower bound limit for which words are taken into account. All
+#' words are considered in the vocabularies that have a count higher than
+#' \code{vocab.fallback} over all texts even if they might not have a higher
+#' relative frequency than \code{vocab.rel}.
+#' @param doc.abs [\code{integer(1)}]\cr
+#' An absolute lower bound limit for which texts are taken into account. All
+#' texts are considered for modeling that have more words (subsetted to words
+#' occurring in the vocabularies) than \code{doc.abs}.
+#' @param init [\code{Date(1)} or \code{integer(1)}]\cr
+#' Date up to which the initial model should be computed. This parameter is
+#' needed/used only if \code{chunks} is passed as \code{character}. Otherwise
+#' the initial model is computed up to the first date in \code{chunks} minus one
+#' day. If \code{init} is passed as \code{integer/numeric}, the \code{init}
+#' lowest date from \code{dates} is selected.
+#' @param type [\code{character(1)}]\cr
+#' One of "ldaPrototype" or "lda" specifying whether a LDAProtoype or standard
+#' LDA should be modeled as initial model. Default is "ldaprototype".
+#' @param id [\code{character(1)}]\cr
+#' Name for the computation/model.
+#' @param ... additional arguments passed to \code{\link[ldaPrototype]{LDARep}}
+#' or \code{\link[ldaPrototype]{LDAPrototype}}, respectively.
+#' Default parameters are \code{alpha = eta = 1/K} and \code{num.iterations = 200}.
+#' There is no default for \code{K}.
+#' @return [\code{named list}] with entries
+#'  \describe{
+#'   \item{\code{id}}{[\code{character(1)}] See above.}
+#'   \item{\code{lda}}{\code{\link{LDA}} object of the fitted RollingLDA.}
+#'   \item{\code{docs}}{[\code{named list}] with modeled texts in a preprocessed format.
+#'   See \code{\link[tosca]{LDAprep}}}
+#'   \item{\code{dates}}{[\code{named Date}] with dates of the modeled texts.}
+#'   \item{\code{vocab}}{[\code{character}] with the vocabularies considered
+#'   for modeling.}
+#'   \item{\code{chunks}}{[\code{data.table}] with specifications for each
+#'   model chunk.}
+#'   \item{\code{param}}{[\code{named list}] with parameter specifications for
+#'   \code{vocab.abs} [\code{integer(1)}], \code{vocab.rel} [0,1],
+#'   \code{vocab.fallback} [\code{integer(1)}] and
+#'   \code{doc.abs} [\code{integer(1)}]. See above for explanation.}
+#' }
+#'
+#' @export RollingLDA
+RollingLDA = function(...) UseMethod("RollingLDA")
 
-# texts muss named list of tokenized texts sein!!!
-# dates muss gleiche Länge und Sortierung (wie texts) haben, oder benannt sein!
+#' @rdname RollingLDA
+#' @export
+RollingLDA.default = function(texts, dates, chunks, memory,
+  vocab.abs = 5, vocab.rel = 0, vocab.fallback = 100, doc.abs = 0,
+  init, type = c("ldaprototype", "lda"), id, ...){
 
-# texts = named list of tokenized texts
-# dates = dates (benannt oder unbenannt - bei letzterem aber dann gleiche Sortierung)
-# chunks = entweder date oder in einer Form, die von seq.Date interpretiert werden kann
-# memory = entweder date, numeric, oder in der Form "ZahlUnit" = beginn jedes Memorys
-# init = date oder numeric = letztes date für initiale LDA - nur benötigt, falls chunks als character gegeben, dann Pflicht!
-# type = welche Form der initialen LDA
-# param = LDAparam/LDAPrototypeparam
-# id = character
-rollinglda = function(texts, dates, chunks, memory,
-                      vocab.abs = 5, vocab.rel = 0, vocab.fallback = 100, doc.abs = 0,
-                      init, type = c("ldaprototype", "lda"), id, ...){
-
-  type = match.arg(type)
+  type = match.arg(tolower(type))
   if (missing(id)) id = paste0("rolling-", type)
 
   if (is.null(names(dates))) names(dates) = names(texts)
@@ -26,6 +99,7 @@ rollinglda = function(texts, dates, chunks, memory,
   if (!is.Date(chunks)){
     chunks.try = try(as.Date(chunks), silent = TRUE)
     if (inherits(chunks.try, "try-error")){
+      if (is.numeric(init)) init = sort(dates)[init]
       assert_date(try(as.Date(init)), any.missing = FALSE, len = 1)
       init = as.Date(init)
       chunks = seq.Date(from = init+1, to = max(dates), by = tolower(chunks))
@@ -53,7 +127,7 @@ rollinglda = function(texts, dates, chunks, memory,
   init = max(dates[dates < chunks[1]])
   wc = .computewordcounts(texts[dates < chunks[1]])
   vocab = wc$words[wc$wordcounts > vocab.abs &
-                     wc$wordcounts > min(vocab.rel * sum(wc$wordcounts), vocab.fallback)]
+      wc$wordcounts > min(vocab.rel * sum(wc$wordcounts), vocab.fallback)]
   docs = LDAprep(texts[dates < chunks[1]], vocab)
   docs = docs[sapply(docs, ncol) > doc.abs]
 
@@ -67,33 +141,33 @@ rollinglda = function(texts, dates, chunks, memory,
   }
 
   res = list(id = id, lda = lda,
-             docs = docs, dates = dates[dates < chunks[1]], vocab = vocab,
-             chunks = data.table(
-               chunk.id = 0L,
-               start.date = min(dates),
-               end.date = init,
-               memory = NA_Date_,
-               n = length(docs),
-               n.discarded = sum(dates < chunks[1]) - length(docs),
-               n.memory = NA_integer_,
-               n.vocab = length(vocab)
-             ),
-             param = list(vocab.abs = vocab.abs, vocab.rel = vocab.rel,
-                          vocab.fallback = vocab.fallback, doc.abs = doc.abs))
+    docs = docs, dates = dates[dates < chunks[1]], vocab = vocab,
+    chunks = data.table(
+      chunk.id = 0L,
+      start.date = min(dates),
+      end.date = init,
+      memory = NA_Date_,
+      n = length(docs),
+      n.discarded = sum(dates < chunks[1]) - length(docs),
+      n.memory = NA_integer_,
+      n.vocab = length(vocab)
+    ),
+    param = list(vocab.abs = vocab.abs, vocab.rel = vocab.rel,
+      vocab.fallback = vocab.fallback, doc.abs = doc.abs))
   class(res) = "RollingLDA"
 
   texts = texts[dates >= chunks[1]]
   dates = dates[dates >= chunks[1]]
   chunks = c(chunks[-1], max(dates))
 
-  # rollinglda_update
   for (i in seq_along(chunks)){
     message("Fitting Chunk ", i, "/", length(chunks), ".")
-    res = rollinglda_update(
+    res = updateRollingLDA(
       x = res,
       texts = texts[dates < chunks[i]],
       dates = dates[dates < chunks[i]],
-      memory = memory[i]
+      memory = memory[i],
+      compute.topics = FALSE
     )
     texts = texts[dates >= chunks[i]]
     dates = dates[dates >= chunks[i]]
@@ -105,166 +179,4 @@ rollinglda = function(texts, dates, chunks, memory,
     K = getK(getLDA(res)),
     vocab = getVocab(res))
   invisible(res)
-}
-
-# texts = new texts: named list of tokenized texts
-# dates = new dates (benannt oder unbenannt - bei letzterem aber dann gleiche Sortierung)
-# memory = entweder date, numeric, oder in der Form "ZahlUnit"
-# param = liste mit einträgen für vocab.abs etc.
-rollinglda_update = function(x, texts, dates, memory, param = getParam(x)){
-
-  # assert auf x!
-  assert_list(texts, types = "character", names = "unique")
-  if (is.null(names(dates))) names(dates) = names(texts)
-  dates = dates[match(names(dates), names(texts))]
-  assert_date(try(as.Date(dates)), any.missing = FALSE, len = length(texts))
-  dates = as.Date(dates)
-  assert_character(as.character(memory), any.missing = FALSE, len = 1)
-  if (!is.Date(memory)){
-    if (is.numeric(memory)){
-      tmp = sort(getDates(x), decreasing = TRUE)[memory]
-      message("memory = ", memory, ": using the date of the ", memory,
-              "th last text as memory, i.e ", tmp)
-      memory = tmp
-    }
-    memory.try = try(as.Date(memory), silent = TRUE)
-    if (inherits(memory.try, "try-error")){
-      memory = tolower(memory)
-      unit.memory = trimws(gsub("([0-9]*)(.*)", "\\2", memory))
-      cand = c("day", "week", "month", "quarter", "year")
-      assert_choice(unit.memory, c(cand, paste0(cand, "s")))
-      if (unit.memory %in% c("year", "years")){
-        update.start = min(dates)
-        floored = " (first new date)"
-      }else{
-        update.start = floor_date(min(dates), unit.memory)
-        floored = paste0(" (first new date floored to ", unit.memory, ")")
-      }
-      if (unit.memory %in% c("quarter", "quarters")){
-        number.quarter = gsub("([0-9]*)(.*)", "\\1", memory)
-        memory = paste0(ifelse(number.quarter == "", 3,
-                               3 * as.integer(number.quarter)), "month")
-      }
-      message("memory = ", memory, ": using texts of the last ", memory, " from ",
-              update.start, floored, " as memory, i.e. ", update.start - period(memory))
-      memory = update.start - period(memory)
-    }else memory = memory.try
-  }
-  assert_date(memory, any.missing = FALSE, len = 1)
-  # assert auf param!
-  vocab.abs = param$vocab.abs
-  vocab.rel = param$vocab.rel
-  vocab.fallback = param$vocab.fallback
-  doc.abs = param$doc.abs
-
-  dates.memory = getDates(x)
-  id.memory = names(dates.memory[dates.memory >= memory])
-  docs.memory = getDocs(x, names = id.memory)
-  n.memory = length(docs.memory)
-
-  # message("Verwende Texte ab ", memory, " als memory (", n.init, ")")
-
-  step.new = rollinglda_one_step(
-    lda = getLDA(x),
-    docs = docs.memory,
-    texts = texts,
-    vocab = getVocab(x),
-    vocab.abs = vocab.abs,
-    vocab.rel = vocab.rel,
-    vocab.fallback = vocab.fallback,
-    doc.abs = doc.abs
-  )
-  chunks = merge.data.table(getChunks(x), data.table(
-    chunk.id = max(getChunks(x)$chunk.id) + 1L,
-    start.date = min(dates),
-    end.date = max(dates),
-    memory = memory,
-    n = step.new$n.docs.new,
-    n.discarded = step.new$n.docs.deleted,
-    n.memory = n.memory,
-    n.vocab = length(step.new$vocab)
-  ), all = TRUE)
-  dates = dates[na.omit(match(names(step.new$docs), names(dates)))]
-  dates = c(getDates(x, names = id.memory, inverse = TRUE), dates)
-  docs = append(getDocs(x, names = id.memory, inverse = TRUE), step.new$docs)
-  res = list(id = getID(x), lda = step.new$lda,
-             docs = docs, dates = dates, vocab = step.new$vocab, chunks = chunks,
-             param = list(vocab.abs = vocab.abs, vocab.rel = vocab.rel,
-                          vocab.fallback = vocab.fallback, doc.abs = doc.abs))
-  class(res) = "RollingLDA"
-  invisible(res)
-}
-
-# internal
-rollinglda_one_step = function(lda, docs, texts, vocab,
-                               vocab.abs = 5, vocab.rel = 0, vocab.fallback = 100, doc.abs = 0){
-  message("rollinglda_one_step")
-  wc = .computewordcounts(texts)
-  vocab.new = wc$words[wc$wordcounts > vocab.abs &
-                         wc$wordcounts > min(vocab.rel * sum(wc$wordcounts), vocab.fallback)]
-  ind = !(vocab.new %in% vocab)
-  if(any(ind)) vocab = c(vocab, vocab.new[ind])
-  docs.new = LDAprep(texts, vocab)
-  docs.new = docs.new[sapply(docs.new, ncol) > doc.abs]
-  n.docs.new = length(docs.new)
-  n.docs.deleted = length(texts) - n.docs.new
-  n.memory = length(docs)
-
-  docs = append(docs, docs.new)
-  assignments.new.sampled = lapply(sapply(docs.new, ncol), function(n)
-    as.integer(sample(getK(lda), n, replace = TRUE)-1))
-
-  res = rollinglda_one_step_fitting(
-    assignments = append(tail(getAssignments(lda), n.memory), assignments.new.sampled),
-    docs = docs,
-    vocab = vocab,
-    n.init = n.memory,
-    K = getK(lda),
-    alpha = getAlpha(lda),
-    eta = getEta(lda),
-    num.iterations = getNum.iterations(lda)
-  )
-  list(
-    lda = LDA(
-      assignments = append(getAssignments(lda), res$assignments),
-      document_sums = cbind(getDocument_sums(lda), res$document_sums),
-      param = getParam(lda)
-    ),
-    docs = docs,
-    vocab = vocab,
-    n.docs.new = n.docs.new,
-    n.docs.deleted = n.docs.deleted,
-    n.memory = n.memory)
-}
-
-# internal
-rollinglda_one_step_fitting = function(assignments, docs, vocab, n.init,
-                                       K, alpha, eta, num.iterations){
-  message("rollinglda_one_step_fitting")
-  topics = compute_topics_matrix_from_assignments(assignments, docs, K, vocab)
-  res = ldaGibbs(docs = docs, K = K, vocab = vocab,
-                 num.iterations = num.iterations, alpha = alpha, eta = eta,
-                 initial = list(
-                   assignments = assignments,
-                   topics = topics,
-                   topic_sums = matrix(as.integer(rowSums(topics)))),
-                 n.init = n.init
-  )
-  list(
-    assignments = res$assignments[(n.init+1):length(docs)],
-    document_sums = res$document_sums[,(n.init+1):length(docs)]
-  )
-}
-
-# internal
-compute_topics_matrix_from_assignments = function(assignments, docs, K, vocab){
-  message("compute_topics_matrix_from_assignments")
-  n.voc = length(vocab)
-  assignments_flatten = unlist(assignments) + 1
-  docs_flatten = unlist(lapply(docs, function(x) x[1,])) + 1
-  topics = do.call(rbind,
-                   lapply(seq_len(K), function(k)
-                     tabulate(docs_flatten[assignments_flatten == k], n.voc)))
-  colnames(topics) = vocab
-  topics
 }

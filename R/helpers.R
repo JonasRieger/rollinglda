@@ -18,3 +18,14 @@
   }
   list(words = words, wordcounts = wordcounts)
 }
+
+compute_topics_matrix_from_assignments = function(assignments, docs, K, vocab){
+  n.voc = length(vocab)
+  assignments_flatten = unlist(assignments) + 1
+  docs_flatten = unlist(lapply(docs, function(x) x[1,])) + 1
+  topics = do.call(rbind,
+    lapply(seq_len(K), function(k)
+      tabulate(docs_flatten[assignments_flatten == k], n.voc)))
+  colnames(topics) = vocab
+  topics
+}

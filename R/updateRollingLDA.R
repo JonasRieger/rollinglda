@@ -1,0 +1,165 @@
+#' @title Updating an existing RollingLDA object
+#'
+#' @description
+#' Performs an update of an existing object consisting of a rolling version
+#' of Latent Dirichlet Allocation.
+#'
+#' @details The function uses an existing RollingLDA object and models new
+#' texts with a specified memory as initialization of the new LDA chunk.
+#'
+#' The function returns a \code{RollingLDA} object. You can receive results and
+#' all other elements of this object with getter functions (see \code{\link{getChunks}}).
+#'
+#' @family RollingLDA functions
+#'
+#' @param x [\code{named list}]\cr
+#' \code{\link{RollingLDA}} object.
+#' @param texts [\code{named list}]\cr
+#' Tokenized texts.
+#' @param dates [\code{(un)named Date}]\cr
+#' Dates of the tokenized texts. If unnamed, it must match the order of texts.
+#' @param memory [\code{Date}, \code{character(1)} or \code{integer(1)}]\cr
+#' Dates of the beginnings of each chunk's memory. If passed as \code{character},
+#' dates are determined by using the dates of the beginnings of each chunk and
+#' substracting the given time interval in \code{memory} passing it as
+#' \code{by} argument in \code{\link{seq.Date}}. If passed as
+#' \code{integer/numeric}, the dates are determined by going backwards the
+#' modeled texts chronologically and taking the date of the text at position
+#' \code{memory}.
+#' @param param [\code{named list}] with entries (Default is \code{getParam(x)})
+#'  \describe{
+#'   \item{\code{vocab.abs}}{[\code{integer(1)}]
+#'   An absolute lower bound limit for which words are taken into account. All
+#'   words are considered in the vocabularies that have a count higher than
+#'   \code{vocab.abs} over all texts and at the same time a higher relative
+#'   frequency than \code{vocab.rel}.}
+#'   \item{\code{vocab.rel}}{[0,1]
+#'   A relative lower bound limit for which words are taken into account.
+#'   See also \code{vocab.abs}.}
+#'   \item{\code{vocab.fallback}}{[\code{integer(1)}]
+#'   An absolute lower bound limit for which words are taken into account. All
+#'   words are considered in the vocabularies that have a count higher than
+#'   \code{vocab.fallback} over all texts even if they might not have a higher
+#'   relative frequency than \code{vocab.rel}.}
+#'   \item{\code{doc.abs}}{[\code{integer(1)}]
+#'   An absolute lower bound limit for which texts are taken into account. All
+#'   texts are considered for modeling that have more words (subsetted to words
+#'   occurring in the vocabularies) than \code{doc.abs}.}
+#' }
+#' @param ... additional arguments.
+#' @return [\code{named list}] with entries
+#'  \describe{
+#'   \item{\code{id}}{[\code{character(1)}] See above.}
+#'   \item{\code{lda}}{\code{\link{LDA}} object of the fitted RollingLDA.}
+#'   \item{\code{docs}}{[\code{named list}] with modeled texts in a preprocessed format.
+#'   See \code{\link[tosca]{LDAprep}}}
+#'   \item{\code{dates}}{[\code{named Date}] with dates of the modeled texts.}
+#'   \item{\code{vocab}}{[\code{character}] with the vocabularies considered
+#'   for modeling.}
+#'   \item{\code{chunks}}{[\code{data.table}] with specifications for each
+#'   model chunk.}
+#'   \item{\code{param}}{[\code{named list}] with parameter specifications for
+#'   \code{vocab.abs} [\code{integer(1)}], \code{vocab.rel} [0,1],
+#'   \code{vocab.fallback} [\code{integer(1)}] and
+#'   \code{doc.abs} [\code{integer(1)}]. See above for explanation.}
+#' }
+#'
+#' @export updateRollingLDA
+updateRollingLDA = function(...) UseMethod("updateRollingLDA")
+
+#' @rdname updateRollingLDA
+#' @export
+updateRollingLDA.RollingLDA = function(x, texts, dates, memory, param = getParam(x),
+  compute.topics = TRUE){
+
+  # assert auf x!
+  assert_list(texts, types = "character", names = "unique")
+  if (is.null(names(dates))) names(dates) = names(texts)
+  dates = dates[match(names(dates), names(texts))]
+  assert_date(try(as.Date(dates)), any.missing = FALSE, len = length(texts))
+  dates = as.Date(dates)
+  assert_character(as.character(memory), any.missing = FALSE, len = 1)
+  if (!is.Date(memory)){
+    if (is.numeric(memory)){
+      tmp = sort(getDates(x), decreasing = TRUE)[memory]
+      message("memory = ", memory, ": using the date of the ", memory,
+        "th last text as memory, i.e ", tmp)
+      memory = tmp
+    }
+    memory.try = try(as.Date(memory), silent = TRUE)
+    if (inherits(memory.try, "try-error")){
+      memory = tolower(memory)
+      unit.memory = trimws(gsub("([0-9]*)(.*)", "\\2", memory))
+      cand = c("day", "week", "month", "quarter", "year")
+      assert_choice(unit.memory, c(cand, paste0(cand, "s")))
+      if (unit.memory %in% c("year", "years")){
+        update.start = min(dates)
+        floored = " (first new date)"
+      }else{
+        update.start = floor_date(min(dates), unit.memory)
+        floored = paste0(" (first new date floored to ", unit.memory, ")")
+      }
+      if (unit.memory %in% c("quarter", "quarters")){
+        number.quarter = gsub("([0-9]*)(.*)", "\\1", memory)
+        memory = paste0(ifelse(number.quarter == "", 3,
+          3 * as.integer(number.quarter)), "month")
+      }
+      message("memory = ", memory, ": using texts of the last ", memory, " from ",
+        update.start, floored, " as memory, i.e. ", update.start - period(memory))
+      memory = update.start - period(memory)
+    }else memory = memory.try
+  }
+  assert_date(memory, any.missing = FALSE, len = 1)
+  # assert auf param!
+  vocab.abs = param$vocab.abs
+  vocab.rel = param$vocab.rel
+  vocab.fallback = param$vocab.fallback
+  doc.abs = param$doc.abs
+
+  dates.memory = getDates(x)
+  id.memory = names(dates.memory[dates.memory >= memory])
+  docs.memory = getDocs(x, names = id.memory)
+  n.memory = length(docs.memory)
+
+  # message("Verwende Texte ab ", memory, " als memory (", n.init, ")")
+
+  step.new = rollinglda_one_step(
+    lda = getLDA(x),
+    docs = docs.memory,
+    texts = texts,
+    vocab = getVocab(x),
+    vocab.abs = vocab.abs,
+    vocab.rel = vocab.rel,
+    vocab.fallback = vocab.fallback,
+    doc.abs = doc.abs
+  )
+  chunks = merge.data.table(getChunks(x), data.table(
+    chunk.id = max(getChunks(x)$chunk.id) + 1L,
+    start.date = min(dates),
+    end.date = max(dates),
+    memory = memory,
+    n = step.new$n.docs.new,
+    n.discarded = step.new$n.docs.deleted,
+    n.memory = n.memory,
+    n.vocab = length(step.new$vocab)
+  ), all = TRUE)
+  dates = dates[na.omit(match(names(step.new$docs), names(dates)))]
+  dates = c(getDates(x, names = id.memory, inverse = TRUE), dates)
+  docs = append(getDocs(x, names = id.memory, inverse = TRUE), step.new$docs)
+  res = list(id = getID(x), lda = step.new$lda,
+    docs = docs, dates = dates, vocab = step.new$vocab, chunks = chunks,
+    param = list(vocab.abs = vocab.abs, vocab.rel = vocab.rel,
+      vocab.fallback = vocab.fallback, doc.abs = doc.abs))
+  class(res) = "RollingLDA"
+  if (compute.topics){
+    res$lda$topics = compute_topics_matrix_from_assignments(
+      assignments = getAssignments(getLDA(res)),
+      docs = getDocs(res),
+      K = getK(getLDA(res)),
+      vocab = getVocab(res))
+  }
+  invisible(res)
+}
+
+#' @export
+RollingLDA.RollingLDA = updateRollingLDA.RollingLDA

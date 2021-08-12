@@ -49,3 +49,9 @@ See \code{\link[ldaPrototype:getSCLOP]{getLDA}}}
 \description{
 TBA
 }
+\seealso{
+Other RollingLDA functions: 
+\code{\link{RollingLDA}()},
+\code{\link{updateRollingLDA}()}
+}
+\concept{RollingLDA functions}
