@@ -4,10 +4,10 @@
 #' Performs an update of an existing object consisting of a rolling version
 #' of Latent Dirichlet Allocation.
 #'
-#' @details The function uses an existing RollingLDA object and models new
-#' texts with a specified memory as initialization of the new LDA chunk.
+#' @details The function uses an existing \code{\link{RollingLDA}} object and
+#' models new texts with a specified memory as initialization of the new LDA chunk.
 #'
-#' The function returns a \code{RollingLDA} object. You can receive results and
+#' The function returns a \code{\link{RollingLDA}} object. You can receive results and
 #' all other elements of this object with getter functions (see \code{\link{getChunks}}).
 #'
 #' @family RollingLDA functions

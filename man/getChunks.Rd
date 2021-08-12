@@ -52,6 +52,7 @@ TBA
 \seealso{
 Other RollingLDA functions: 
 \code{\link{RollingLDA}()},
+\code{\link{as.RollingLDA}()},
 \code{\link{updateRollingLDA}()}
 }
 \concept{RollingLDA functions}
