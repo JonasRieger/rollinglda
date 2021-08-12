@@ -21,13 +21,13 @@ Please cite the package using the BibTeX entry, which is obtained by the call ``
 * [tosca](https://github.com/Docma-TU/tosca) is a framework for statistical methods in content analysis including visualizations and validation techniques. It is also useful for managing and manipulating text data to a structure requested by ``ldaPrototype`` and ``rollinglda``.
 * [topicmodels](https://CRAN.R-project.org/package=topicmodels) is another framework for various topic models based on the Latent Dirichlet Allocation and Correlated Topics Models.
 * [(c)dtm](https://github.com/blei-lab/dtm) is an implementation of dynamic topic models.
+* [Online LDA](https://github.com/blei-lab/onlineldavb) is an implementation of online learning for Laten Dirichlet Allocation.
 
 ## Related Methods
 * [TM-LDA](https://doi.org/10.1145/2339530.2339552) is an online modeling approach for latent topics (especially in social media).
 * [Streaming-LDA](https://doi.org/10.1145/2939672.2939781) is a Copula-based approach to model document streams.
 * [Topics over Time](https://doi.org/10.1145/1150402.1150450) is a continuous time model for word co-occurences.
 * [This paper](https://doi.org/10.1145/2020408.2020551) presents a time-dependent topic model for multiple text streams.
-* [This paper](https://papers.nips.cc/paper/2010/hash/71f6278d140af599e06ad9bf1ba03cb0-Abstract.html) presents an approach of online learning for Latent Dirichlet Allocation.
 
 ## Contribution
 This R package is licensed under the [GPLv3](https://www.gnu.org/licenses/gpl-3.0.en.html).
