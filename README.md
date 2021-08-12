@@ -23,11 +23,11 @@ Please cite the package using the BibTeX entry, which is obtained by the call ``
 * [(c)dtm](https://github.com/blei-lab/dtm) is an implementation of dynamic topic models.
 
 ## Related Methods
-* [Streaming-LDA](https://dl.acm.org/doi/10.1145/2939672.2939781) is a Copula-based approach to model document streams.
-* [Topics over Time](https://people.cs.umass.edu/~mccallum/papers/tot-kdd06s.pdf) is a continuous time model for word co-occurences.
 * [TM-LDA](https://doi.org/10.1145/2339530.2339552) is an online modeling approach for latent topics (especially in social media).
+* [Streaming-LDA](https://doi.org/10.1145/2939672.2939781) is a Copula-based approach to model document streams.
+* [Topics over Time](https://doi.org/10.1145/1150402.1150450) is a continuous time model for word co-occurences.
 * [This paper](https://doi.org/10.1145/2020408.2020551) presents a time-dependent topic model for multiple text streams.
-* Online Learning for Latent Dirichlet Allocation [link](https://papers.nips.cc/paper/2010/hash/71f6278d140af599e06ad9bf1ba03cb0-Abstract.html)
+* [This paper](https://papers.nips.cc/paper/2010/hash/71f6278d140af599e06ad9bf1ba03cb0-Abstract.html) presents an approach of online learning for Latent Dirichlet Allocation.
 
 ## Contribution
 This R package is licensed under the [GPLv3](https://www.gnu.org/licenses/gpl-3.0.en.html).
