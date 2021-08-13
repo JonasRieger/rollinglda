@@ -18,6 +18,12 @@
 #' Tokenized texts.
 #' @param dates [\code{(un)named Date}]\cr
 #' Dates of the tokenized texts. If unnamed, it must match the order of texts.
+#' @param chunks [\code{Date} or \code{character(1)}]\cr
+#' Dates of the beginnings of each chunk to be modeled as updates.
+#' If passed as \code{character}, dates are determined by passing the minimum of
+#' \code{dates} as \code{from} argument, \code{max(dates)} as \code{to} argument
+#' and \code{chunks} as \code{by} argument in \code{\link{seq.Date}}.
+#' If not passed, all texts are interpreted as one chunk.
 #' @param memory [\code{Date}, \code{character(1)} or \code{integer(1)}]\cr
 #' Dates of the beginnings of each chunk's memory. If passed as \code{character},
 #' dates are determined by using the dates of the beginnings of each chunk and
@@ -65,14 +71,87 @@
 #' }
 #'
 #' @export updateRollingLDA
-updateRollingLDA = function(...) UseMethod("updateRollingLDA")
+updateRollingLDA = function(x, texts, dates, chunks, memory, param = getParam(x),
+                            compute.topics = TRUE){
 
-#' @rdname updateRollingLDA
-#' @export
-updateRollingLDA.RollingLDA = function(x, texts, dates, memory, param = getParam(x),
-  compute.topics = TRUE){
+  if (!is.RollingLDA(x)){
+    is.RollingLDA(x, verbose = TRUE)
+    stop("\"x\" is not a RollingLDA object")
+  }
 
-  # assert auf x!
+  if (is.null(names(dates))) names(dates) = names(texts)
+  dates = dates[match(names(dates), names(texts))]
+  assert_date(try(as.Date(dates)), any.missing = FALSE, len = length(texts))
+  dates = as.Date(dates)
+
+  if (missing(chunks)) chunks = min(dates)
+  if (!is.Date(chunks)){
+    chunks.try = try(as.Date(chunks), silent = TRUE)
+    if (inherits(chunks.try, "try-error")){
+      chunks = seq.Date(from = min(dates), to = max(dates), by = tolower(chunks))
+    }
+    else chunks = chunks.try
+  }
+  assert_date(chunks, any.missing = FALSE)
+
+  if (!is.Date(memory)){
+    if (is.numeric(memory)){
+      tmp = sort(c(getDates(x), dates), decreasing = TRUE)
+      memory = as.Date(unname(
+        sapply(chunks, function(x) (as.character(tmp[tmp < x])[memory]))))
+    }
+    memory.try = try(as.Date(memory), silent = TRUE)
+    if (inherits(memory.try, "try-error")){
+      if (!grepl("[0-9]", memory)) memory = paste0("1 ", memory)
+      memory = as.Date(sapply(chunks, function(x)
+        as.character(seq.Date(from = x, by = paste0("-", memory), length.out = 2)[2])))
+    }
+    else memory = memory.try
+  }
+  assert_date(memory, any.missing = FALSE, len = length(chunks))
+
+  if (length(chunks) == 1){
+    return(updateRollingLDA_one_step(
+      x = x,
+      texts = text,
+      dates = dates,
+      memory = memory,
+      param = param,
+      compute.topics = compute.topics
+    ))
+  }else{
+    for (i in seq_along(chunks)){
+      message("Fitting Chunk ", i, "/", length(chunks), ".")
+      res = updateRollingLDA_one_step(
+        x = res,
+        texts = texts[dates < chunks[i]],
+        dates = dates[dates < chunks[i]],
+        memory = memory[i],
+        compute.topics = FALSE
+      )
+      texts = texts[dates >= chunks[i]]
+      dates = dates[dates >= chunks[i]]
+    }
+    if (compute.topics){
+      message("Compute topic matrix.")
+      res$lda$topics = compute_topics_matrix_from_assignments(
+        assignments = getAssignments(getLDA(res)),
+        docs = getDocs(res),
+        K = getK(getLDA(res)),
+        vocab = getVocab(res))
+    }
+    invisible(res)
+  }
+}
+
+updateRollingLDA_one_step = function(x, texts, dates, memory, param = getParam(x),
+                                     compute.topics = TRUE){
+
+  if (!is.RollingLDA(x)){
+    is.RollingLDA(x, verbose = TRUE)
+    stop("\"x\" is not a RollingLDA object")
+  }
+
   vocab.abs = param$vocab.abs
   vocab.rel = param$vocab.rel
   vocab.fallback = param$vocab.fallback
@@ -82,42 +161,7 @@ updateRollingLDA.RollingLDA = function(x, texts, dates, memory, param = getParam
   assert_int(vocab.fallback, lower = 0)
   assert_int(doc.abs, lower = 0)
   assert_list(texts, types = "character", names = "unique")
-
-  if (is.null(names(dates))) names(dates) = names(texts)
-  dates = dates[match(names(dates), names(texts))]
-  assert_date(try(as.Date(dates)), any.missing = FALSE, len = length(texts))
-  dates = as.Date(dates)
-  assert_character(as.character(memory), any.missing = FALSE, len = 1)
-  if (!is.Date(memory)){
-    if (is.numeric(memory)){
-      tmp = sort(getDates(x), decreasing = TRUE)[memory]
-      message("memory = ", memory, ": using the date of the ", memory,
-        "th last text as memory, i.e ", tmp)
-      memory = tmp
-    }
-    memory.try = try(as.Date(memory), silent = TRUE)
-    if (inherits(memory.try, "try-error")){
-      memory = tolower(memory)
-      unit.memory = trimws(gsub("([0-9]*)(.*)", "\\2", memory))
-      cand = c("day", "week", "month", "quarter", "year")
-      assert_choice(unit.memory, c(cand, paste0(cand, "s")))
-      if (unit.memory %in% c("year", "years")){
-        update.start = min(dates)
-        floored = " (first new date)"
-      }else{
-        update.start = floor_date(min(dates), unit.memory)
-        floored = paste0(" (first new date floored to ", unit.memory, ")")
-      }
-      if (unit.memory %in% c("quarter", "quarters")){
-        number.quarter = gsub("([0-9]*)(.*)", "\\1", memory)
-        memory = paste0(ifelse(number.quarter == "", 3,
-          3 * as.integer(number.quarter)), "month")
-      }
-      message("memory = ", memory, ": using texts of the last ", memory, " from ",
-        update.start, floored, " as memory, i.e. ", update.start - period(memory))
-      memory = update.start - period(memory)
-    }else memory = memory.try
-  }
+  assert_date(dates, any.missing = FALSE, len = length(texts))
   assert_date(memory, any.missing = FALSE, len = 1)
 
   dates.memory = getDates(x)
@@ -149,11 +193,12 @@ updateRollingLDA.RollingLDA = function(x, texts, dates, memory, param = getParam
   dates = c(getDates(x), dates)
   docs = append(getDocs(x, names = id.memory, inverse = TRUE), step.new$docs)
   res = list(id = getID(x), lda = step.new$lda,
-    docs = docs, dates = dates, vocab = step.new$vocab, chunks = chunks,
-    param = list(vocab.abs = vocab.abs, vocab.rel = vocab.rel,
-      vocab.fallback = vocab.fallback, doc.abs = doc.abs))
+             docs = docs, dates = dates, vocab = step.new$vocab, chunks = chunks,
+             param = list(vocab.abs = vocab.abs, vocab.rel = vocab.rel,
+                          vocab.fallback = vocab.fallback, doc.abs = doc.abs))
   class(res) = "RollingLDA"
   if (compute.topics){
+    message("Compute topic matrix.")
     res$lda$topics = compute_topics_matrix_from_assignments(
       assignments = getAssignments(getLDA(res)),
       docs = getDocs(res),
@@ -165,4 +210,39 @@ updateRollingLDA.RollingLDA = function(x, texts, dates, memory, param = getParam
 
 #' @rdname updateRollingLDA
 #' @export
-RollingLDA.RollingLDA = updateRollingLDA.RollingLDA
+RollingLDA.RollingLDA = updateRollingLDA
+
+
+if(FALSE){
+  assert_character(as.character(memory), any.missing = FALSE)
+  if (!is.Date(memory)){
+    if (is.numeric(memory)){
+      tmp = sort(getDates(x), decreasing = TRUE)[memory]
+      message("memory = ", memory, ": using the date of the ", memory,
+              "th last text as memory, i.e ", tmp)
+      memory = tmp
+    }
+    memory.try = try(as.Date(memory), silent = TRUE)
+    if (inherits(memory.try, "try-error")){
+      memory = tolower(memory)
+      unit.memory = trimws(gsub("([0-9]*)(.*)", "\\2", memory))
+      cand = c("day", "week", "month", "quarter", "year")
+      assert_choice(unit.memory, c(cand, paste0(cand, "s")))
+      if (unit.memory %in% c("year", "years")){
+        update.start = min(dates)
+        floored = " (first new date)"
+      }else{
+        update.start = floor_date(min(dates), unit.memory)
+        floored = paste0(" (first new date floored to ", unit.memory, ")")
+      }
+      if (unit.memory %in% c("quarter", "quarters")){
+        number.quarter = gsub("([0-9]*)(.*)", "\\1", memory)
+        memory = paste0(ifelse(number.quarter == "", 3,
+                               3 * as.integer(number.quarter)), "month")
+      }
+      message("memory = ", memory, ": using texts of the last ", memory, " from ",
+              update.start, floored, " as memory, i.e. ", update.start - period(memory))
+      memory = update.start - period(memory)
+    }else memory = memory.try
+  }
+}

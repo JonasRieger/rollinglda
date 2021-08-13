@@ -2,26 +2,30 @@
 % Please edit documentation in R/updateRollingLDA.R
 \name{updateRollingLDA}
 \alias{updateRollingLDA}
-\alias{updateRollingLDA.RollingLDA}
 \alias{RollingLDA.RollingLDA}
 \title{Updating an existing RollingLDA object}
 \usage{
-updateRollingLDA(...)
-
-\method{updateRollingLDA}{RollingLDA}(
+updateRollingLDA(
   x,
   texts,
   dates,
+  chunks,
   memory,
   param = getParam(x),
   compute.topics = TRUE
 )
 
-\method{RollingLDA}{RollingLDA}(x, texts, dates, memory, param = getParam(x), compute.topics = TRUE)
+\method{RollingLDA}{RollingLDA}(
+  x,
+  texts,
+  dates,
+  chunks,
+  memory,
+  param = getParam(x),
+  compute.topics = TRUE
+)
 }
 \arguments{
-\item{...}{additional arguments.}
-
 \item{x}{[\code{named list}]\cr
 \code{\link{RollingLDA}} object.}
 
@@ -30,6 +34,13 @@ Tokenized texts.}
 
 \item{dates}{[\code{(un)named Date}]\cr
 Dates of the tokenized texts. If unnamed, it must match the order of texts.}
+
+\item{chunks}{[\code{Date} or \code{character(1)}]\cr
+Dates of the beginnings of each chunk to be modeled as updates.
+If passed as \code{character}, dates are determined by passing the minimum of
+\code{dates} as \code{from} argument, \code{max(dates)} as \code{to} argument
+and \code{chunks} as \code{by} argument in \code{\link{seq.Date}}.
+If not passed, all texts are interpreted as one chunk.}
 
 \item{memory}{[\code{Date}, \code{character(1)} or \code{integer(1)}]\cr
 Dates of the beginnings of each chunk's memory. If passed as \code{character},
@@ -60,6 +71,8 @@ modeled texts chronologically and taking the date of the text at position
   texts are considered for modeling that have more words (subsetted to words
   occurring in the vocabularies) than \code{doc.abs}.}
 }}
+
+\item{...}{additional arguments.}
 }
 \value{
 [\code{named list}] with entries
