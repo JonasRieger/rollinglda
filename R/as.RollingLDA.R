@@ -14,12 +14,29 @@
 #' Output from \code{\link[lda]{lda.collapsed.gibbs.sampler}}. Alternatively each
 #' element can be passed for individual results. Individually set elements
 #' overwrite elements from \code{x}.
-#' @param id TBA
-#' @param lda TBA
-#' @param docs TBA
-#' @param dates TBA
-#' @param vocab TBA
-#' @param chunks TBA
+#' @param id [\code{character(1)}]\cr
+#' Name for the computation/model.
+#' @param lda [\code{named list}]\cr
+#' \code{\link{LDA}} object.
+#' @param docs [\code{named list}]\cr
+#' Texts in a preprocessed format. See \code{\link[tosca]{LDAprep}}.
+#' @param dates [\code{(un)named Date}]\cr
+#' Dates of the texts. If unnamed, it must match the order of docs.
+#' @param vocab [\code{character}]\cr
+#' Vocabularies.
+#' @param chunks [\code{data.table}]\cr
+#' with specifications for each model chunk
+#' \describe{
+#'   \item{\code{chunk.id}}{[\code{integer}] bla}
+#'   \item{\code{start.date}}{[\code{Date}] bla}
+#'   \item{\code{end.date}}{[\code{Date}] bla}
+#'   \item{\code{memory}}{[\code{Date}] bla}
+#'   \item{\code{n}}{[\code{integer}] bla}
+#'   \item{\code{n.dicsarded}}{[\code{integer}] bla}
+#'   \item{\code{n.memory}}{[\code{integer}] bla}
+#'   \item{\code{n.vocab}}{[\code{integer}] bla}
+#' }
+#' If not passed, \code{lda} is interpreted as initialization chunk.
 #' @param param [\code{named list}]\cr
 #' Parameters of the function call \code{\link[lda]{lda.collapsed.gibbs.sampler}}.
 #' List always should contain names "K", "alpha", "eta" and "num.iterations".
@@ -30,18 +47,52 @@
 #' @return [\code{named list}] \code{\link{RollingLDA}} object.
 #'
 #' @export as.RollingLDA
-as.RollingLDA = function(x){
-  if(FALSE){
-    if (!missing(x)){
-      if (missing(param) && hasName(x, "param")) param = x$param
-      if (missing(assignments)) assignments = x$assignments
-      if (missing(topics)) topics = x$topics
-      if (missing(document_sums)) document_sums = x$document_sums
-      if (missing(document_expects)) document_expects = x$document_expects
-      if (missing(log.likelihoods)) log.likelihoods = x$log.likelihoods
+as.RollingLDA = function(x, id, lda, docs, dates, vocab, chunks, param){
+  if (!missing(x)){
+    if (missing(id)) id = x$id
+    if (missing(lda)) lda = x$lda
+    if (missing(docs)) docs = x$docs
+    if (missing(dates)) dates = x$dates
+    if (missing(vocab)) vocab = x$vocab
+    if (missing(chunks)) chunks = x$chunks
+    if (missing(param)) param = x$param
+  }else{
+    if (missing(id)) id = "rolling - converted"
+    if (!is.LDA(lda)){
+      is.LDA(lda, verbose = TRUE)
+      stop("\"lda\" not an LDA object")
     }
+    if (is.null(names(dates))) names(dates) = names(docs)
+    dates = as.Date(dates[match(names(dates), names(docs))])
+    if (missing(vocab)) vocab = colnames(getTopics(lda))
+    if (missing(chunks)){
+      chunks = data.table(
+        chunk.id = 0L,
+        start.date = min(dates),
+        end.date = max(dates),
+        memory = NA_Date_,
+        n = length(docs),
+        n.discarded = NA_integer_,
+        n.memory = NA_integer_,
+        n.vocab = length(vocab)
+      )
+    }
+    if (missing(param)) param = .defaultParam()
   }
-  cat("not implemented")
+  res = list(
+    id = id,
+    lda = lda,
+    docs = docs,
+    dates = dates,
+    vocab = vocab,
+    chunks = chunks,
+    param = param)
+  class(res) = "RollingLDA"
+  if (!is.RollingLDA(res)){
+    is.RollingLDA(res, verbose = TRUE)
+    stop("input arguments do not create a RollingLDA object")
+  }
+  res
 }
 
 #' @rdname as.RollingLDA
@@ -64,7 +115,7 @@ is.RollingLDA = function(obj, verbose = FALSE){
   if (!test_list(obj, types = c("character", "LDA", "list", "Date", "character", "data.table", "list"),
                  names = "named", any.missing = FALSE)){
     if (verbose) message(check_list(obj, types = c("character", "LDA", "list", "Date", "character", "data.table", "list"),
-                           names = "named", any.missing = FALSE))
+                                    names = "named", any.missing = FALSE))
     return(FALSE)
   }
   if (!test_set_equal(names(obj), testNames)){
@@ -139,7 +190,7 @@ is.RollingLDA = function(obj, verbose = FALSE){
   chunks = getChunks(obj)
   if (!is.data.table(chunks) ||
       !all(c("chunk.id", "start.date", "end.date", "memory", "n", "n.discarded",
-           "n.memory", "n.vocab") %in% colnames(chunks))){
+             "n.memory", "n.vocab") %in% colnames(chunks))){
     if (verbose) message("not a data.table with standard parameters")
     return(FALSE)
   }
@@ -189,6 +240,26 @@ is.RollingLDA = function(obj, verbose = FALSE){
   }
   if (is.unsorted(chunks$n.vocab)){
     if (verbose) message("\"n.vocab\" is not monotonously increasing")
+    return(FALSE)
+  }
+  if (any(is.na(chunks$chunk.id))){
+    if (verbose) message("NA(s) in \"chunk.id\"")
+    return(FALSE)
+  }
+  if (any(is.na(chunks$n))){
+    if (verbose) message("NA(s) in \"n\"")
+    return(FALSE)
+  }
+  if (any(is.na(chunks$n.vocab))){
+    if (verbose) message("NA(s) in \"n.vocab\"")
+    return(FALSE)
+  }
+  if (any(is.na(chunks$start.date))){
+    if (verbose) message("NA(s) in \"start.date\"")
+    return(FALSE)
+  }
+  if (any(is.na(chunks$end.date))){
+    if (verbose) message("NA(s) in \"end.date\"")
     return(FALSE)
   }
   if (min(dates) < min(chunks$start.date)){

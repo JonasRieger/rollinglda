@@ -67,7 +67,7 @@
 #'   \item{\code{id}}{[\code{character(1)}] See above.}
 #'   \item{\code{lda}}{\code{\link{LDA}} object of the fitted RollingLDA.}
 #'   \item{\code{docs}}{[\code{named list}] with modeled texts in a preprocessed format.
-#'   See \code{\link[tosca]{LDAprep}}}
+#'   See \code{\link[tosca]{LDAprep}}.}
 #'   \item{\code{dates}}{[\code{named Date}] with dates of the modeled texts.}
 #'   \item{\code{vocab}}{[\code{character}] with the vocabularies considered
 #'   for modeling.}

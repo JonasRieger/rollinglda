@@ -5,7 +5,7 @@
 \alias{is.RollingLDA}
 \title{RollingLDA Object}
 \usage{
-as.RollingLDA(x)
+as.RollingLDA(x, id, lda, docs, dates, vocab, chunks, param)
 
 is.RollingLDA(obj, verbose = FALSE)
 }
@@ -15,27 +15,44 @@ Output from \code{\link[lda]{lda.collapsed.gibbs.sampler}}. Alternatively each
 element can be passed for individual results. Individually set elements
 overwrite elements from \code{x}.}
 
+\item{id}{[\code{character(1)}]\cr
+Name for the computation/model.}
+
+\item{lda}{[\code{named list}]\cr
+\code{\link{LDA}} object.}
+
+\item{docs}{[\code{named list}]\cr
+Texts in a preprocessed format. See \code{\link[tosca]{LDAprep}}.}
+
+\item{dates}{[\code{(un)named Date}]\cr
+Dates of the texts. If unnamed, it must match the order of docs.}
+
+\item{vocab}{[\code{character}]\cr
+Vocabularies.}
+
+\item{chunks}{[\code{data.table}]\cr
+with specifications for each model chunk
+\describe{
+  \item{\code{chunk.id}}{[\code{integer}] bla}
+  \item{\code{start.date}}{[\code{Date}] bla}
+  \item{\code{end.date}}{[\code{Date}] bla}
+  \item{\code{memory}}{[\code{Date}] bla}
+  \item{\code{n}}{[\code{integer}] bla}
+  \item{\code{n.dicsarded}}{[\code{integer}] bla}
+  \item{\code{n.memory}}{[\code{integer}] bla}
+  \item{\code{n.vocab}}{[\code{integer}] bla}
+}
+If not passed, \code{lda} is interpreted as initialization chunk.}
+
+\item{param}{[\code{named list}]\cr
+Parameters of the function call \code{\link[lda]{lda.collapsed.gibbs.sampler}}.
+List always should contain names "K", "alpha", "eta" and "num.iterations".}
+
 \item{obj}{[\code{R} object]\cr
 Object to test.}
 
 \item{verbose}{[\code{logical(1)}]\cr
 Should test information be given in the console?}
-
-\item{id}{TBA}
-
-\item{lda}{TBA}
-
-\item{docs}{TBA}
-
-\item{dates}{TBA}
-
-\item{vocab}{TBA}
-
-\item{chunks}{TBA}
-
-\item{param}{[\code{named list}]\cr
-Parameters of the function call \code{\link[lda]{lda.collapsed.gibbs.sampler}}.
-List always should contain names "K", "alpha", "eta" and "num.iterations".}
 }
 \value{
 [\code{named list}] \code{\link{RollingLDA}} object.

@@ -27,3 +27,5 @@
 #' @importFrom lubridate period
 #' @useDynLib rollinglda, .registration=TRUE
 "_PACKAGE"
+
+.defaultParam = function() list(vocab.abs = 5L, vocab.rel = 0, vocab.fallback = 100L, doc.abs = 0L)
