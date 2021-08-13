@@ -56,29 +56,28 @@ as.RollingLDA = function(x, id, lda, docs, dates, vocab, chunks, param){
     if (missing(vocab)) vocab = x$vocab
     if (missing(chunks)) chunks = x$chunks
     if (missing(param)) param = x$param
-  }else{
-    if (missing(id)) id = "rolling - converted"
-    if (!is.LDA(lda)){
-      is.LDA(lda, verbose = TRUE)
-      stop("\"lda\" not an LDA object")
-    }
-    if (is.null(names(dates))) names(dates) = names(docs)
-    dates = as.Date(dates[match(names(dates), names(docs))])
-    if (missing(vocab)) vocab = colnames(getTopics(lda))
-    if (missing(chunks)){
-      chunks = data.table(
-        chunk.id = 0L,
-        start.date = min(dates),
-        end.date = max(dates),
-        memory = NA_Date_,
-        n = length(docs),
-        n.discarded = NA_integer_,
-        n.memory = NA_integer_,
-        n.vocab = length(vocab)
-      )
-    }
-    if (missing(param)) param = .defaultParam()
   }
+  if (missing(id)) id = "rolling - converted"
+  if (!is.LDA(lda)){
+    is.LDA(lda, verbose = TRUE)
+    stop("\"lda\" not an LDA object")
+  }
+  if (is.null(names(dates))) names(dates) = names(docs)
+  dates = as.Date(dates[match(names(dates), names(docs))])
+  if (missing(vocab)) vocab = colnames(getTopics(lda))
+  if (missing(chunks)){
+    chunks = data.table(
+      chunk.id = 0L,
+      start.date = min(dates),
+      end.date = max(dates),
+      memory = NA_Date_,
+      n = length(docs),
+      n.discarded = NA_integer_,
+      n.memory = NA_integer_,
+      n.vocab = length(vocab)
+    )
+  }
+  if (missing(param)) param = .defaultParam()
   res = list(
     id = id,
     lda = lda,
