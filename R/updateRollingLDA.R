@@ -146,7 +146,7 @@ updateRollingLDA.RollingLDA = function(x, texts, dates, memory, param = getParam
     n.vocab = length(step.new$vocab)
   ), all = TRUE)
   dates = dates[na.omit(match(names(step.new$docs), names(dates)))]
-  dates = c(getDates(x, names = id.memory, inverse = TRUE), dates)
+  dates = c(getDates(x), dates)
   docs = append(getDocs(x, names = id.memory, inverse = TRUE), step.new$docs)
   res = list(id = getID(x), lda = step.new$lda,
     docs = docs, dates = dates, vocab = step.new$vocab, chunks = chunks,
