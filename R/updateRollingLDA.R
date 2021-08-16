@@ -17,9 +17,9 @@
 #' @param texts [\code{named list}]\cr
 #' Tokenized texts.
 #' @param dates [\code{(un)named Date}]\cr
-#' Dates of the tokenized texts. If unnamed, it must match the order of texts.
+#' Sorted dates of the tokenized texts. If unnamed, it must match the order of texts.
 #' @param chunks [\code{Date} or \code{character(1)}]\cr
-#' Dates of the beginnings of each chunk to be modeled as updates.
+#' Sorted dates of the beginnings of each chunk to be modeled as updates.
 #' If passed as \code{character}, dates are determined by passing the minimum of
 #' \code{dates} as \code{from} argument, \code{max(dates)} as \code{to} argument
 #' and \code{chunks} as \code{by} argument in \code{\link{seq.Date}}.
@@ -81,7 +81,8 @@ updateRollingLDA = function(x, texts, dates, chunks, memory, param = getParam(x)
 
   if (is.null(names(dates))) names(dates) = names(texts)
   dates = dates[match(names(dates), names(texts))]
-  assert_date(try(as.Date(dates)), any.missing = FALSE, len = length(texts))
+  assert_date(try(as.Date(dates)), any.missing = FALSE, len = length(texts),
+              lower = max(getDates(x))+1)
   dates = as.Date(dates)
 
   if (missing(chunks)) chunks = min(dates)
@@ -92,7 +93,8 @@ updateRollingLDA = function(x, texts, dates, chunks, memory, param = getParam(x)
     }
     else chunks = chunks.try
   }
-  assert_date(chunks, any.missing = FALSE)
+  assert_date(chunks, any.missing = FALSE, lower = max(getDates(x))+1)
+  assert_date(min(dates), any.missing = FALSE, lower = min(chunks))
 
   if (!is.Date(memory)){
     if (is.numeric(memory)){
@@ -109,7 +111,13 @@ updateRollingLDA = function(x, texts, dates, chunks, memory, param = getParam(x)
     else memory = memory.try
   }
   assert_date(memory, any.missing = FALSE, len = length(chunks))
-
+  if (any(memory > chunks)){
+    tmp = memory > chunks
+    stop("all dates in \"memory\" must not be greater than the pendant in \"chunks\", but ",
+         paste0(memory[tmp], " > " , chunks[tmp], collapse = ", "))
+  }
+  if (is.unsorted(chunks)) stop("\"chunks\" must be sorted")
+  if (is.unsorted(memory)) stop("\"memory\" must be sorted")
   if (length(chunks) == 1){
     return(updateRollingLDA_one_step(
       x = x,
@@ -161,10 +169,14 @@ updateRollingLDA_one_step = function(x, texts, dates, memory, param = getParam(x
   assert_int(vocab.fallback, lower = 0)
   assert_int(doc.abs, lower = 0)
   assert_list(texts, types = "character", names = "unique")
-  assert_date(dates, any.missing = FALSE, len = length(texts))
   assert_date(memory, any.missing = FALSE, len = 1)
+  assert_date(dates, any.missing = FALSE, len = length(texts), lower = memory)
 
   dates.memory = getDates(x)
+  assert_date(dates, lower = max(dates.memory)+1)
+
+  ### hier prüfen auf leere chunks und leeres memory
+
   id.memory = names(dates.memory[dates.memory >= memory])
   docs.memory = getDocs(x, names = id.memory)
   n.memory = length(docs.memory)

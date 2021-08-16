@@ -1,5 +1,5 @@
 rollinglda_one_step = function(lda, docs, texts, vocab,
-  vocab.abs = 5, vocab.rel = 0, vocab.fallback = 100, doc.abs = 0){
+  vocab.abs = 5L, vocab.rel = 0, vocab.fallback = 100L, doc.abs = 0L){
   wc = .computewordcounts(texts)
   vocab.new = wc$words[wc$wordcounts > vocab.abs &
       wc$wordcounts > min(vocab.rel * sum(wc$wordcounts), vocab.fallback)]

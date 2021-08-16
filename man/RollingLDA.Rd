@@ -12,10 +12,10 @@ RollingLDA(...)
   dates,
   chunks,
   memory,
-  vocab.abs = 5,
+  vocab.abs = 5L,
   vocab.rel = 0,
-  vocab.fallback = 100,
-  doc.abs = 0,
+  vocab.fallback = 100L,
+  doc.abs = 0L,
   init,
   type = c("ldaprototype", "lda"),
   id,
@@ -35,13 +35,13 @@ Tokenized texts.}
 Dates of the tokenized texts. If unnamed, it must match the order of texts.}
 
 \item{chunks}{[\code{Date} or \code{character(1)}]\cr
-Dates of the beginnings of each chunk to be modeled after the initial model.
+Sorted dates of the beginnings of each chunk to be modeled after the initial model.
 If passed as \code{character}, dates are determined by passing \code{init}
 plus one day as \code{from} argument, \code{max(dates)} as \code{to} argument
 and \code{chunks} as \code{by} argument in \code{\link{seq.Date}}.}
 
 \item{memory}{[\code{Date}, \code{character(1)} or \code{integer(1)}]\cr
-Dates of the beginnings of each chunk's memory. If passed as \code{character},
+Sorted dates of the beginnings of each chunk's memory. If passed as \code{character},
 dates are determined by using the dates of the beginnings of each chunk and
 substracting the given time interval in \code{memory} passing it as
 \code{by} argument in \code{\link{seq.Date}}. If passed as

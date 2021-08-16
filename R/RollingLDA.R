@@ -18,12 +18,12 @@
 #' @param dates [\code{(un)named Date}]\cr
 #' Dates of the tokenized texts. If unnamed, it must match the order of texts.
 #' @param chunks [\code{Date} or \code{character(1)}]\cr
-#' Dates of the beginnings of each chunk to be modeled after the initial model.
+#' Sorted dates of the beginnings of each chunk to be modeled after the initial model.
 #' If passed as \code{character}, dates are determined by passing \code{init}
 #' plus one day as \code{from} argument, \code{max(dates)} as \code{to} argument
 #' and \code{chunks} as \code{by} argument in \code{\link{seq.Date}}.
 #' @param memory [\code{Date}, \code{character(1)} or \code{integer(1)}]\cr
-#' Dates of the beginnings of each chunk's memory. If passed as \code{character},
+#' Sorted dates of the beginnings of each chunk's memory. If passed as \code{character},
 #' dates are determined by using the dates of the beginnings of each chunk and
 #' substracting the given time interval in \code{memory} passing it as
 #' \code{by} argument in \code{\link{seq.Date}}. If passed as
@@ -85,7 +85,7 @@ RollingLDA = function(...) UseMethod("RollingLDA")
 #' @rdname RollingLDA
 #' @export
 RollingLDA.default = function(texts, dates, chunks, memory,
-  vocab.abs = 5, vocab.rel = 0, vocab.fallback = 100, doc.abs = 0,
+  vocab.abs = 5L, vocab.rel = 0, vocab.fallback = 100L, doc.abs = 0L,
   init, type = c("ldaprototype", "lda"), id, ...){
 
   assert_int(vocab.abs, lower = 0)
@@ -130,6 +130,13 @@ RollingLDA.default = function(texts, dates, chunks, memory,
     else memory = memory.try
   }
   assert_date(memory, any.missing = FALSE, len = length(chunks))
+  if (any(memory > chunks)){
+    tmp = memory > chunks
+    stop("all dates in \"memory\" must not be greater than the pendant in \"chunks\", but ",
+         paste0(memory[tmp], " > " , chunks[tmp], collapse = ", "))
+  }
+  if (is.unsorted(chunks)) stop("\"chunks\" must be sorted")
+  if (is.unsorted(memory)) stop("\"memory\" must be sorted")
 
   init = max(dates[dates < chunks[1]])
   wc = .computewordcounts(texts[dates < chunks[1]])

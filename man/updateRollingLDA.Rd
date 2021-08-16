@@ -33,10 +33,10 @@ updateRollingLDA(
 Tokenized texts.}
 
 \item{dates}{[\code{(un)named Date}]\cr
-Dates of the tokenized texts. If unnamed, it must match the order of texts.}
+Sorted dates of the tokenized texts. If unnamed, it must match the order of texts.}
 
 \item{chunks}{[\code{Date} or \code{character(1)}]\cr
-Dates of the beginnings of each chunk to be modeled as updates.
+Sorted dates of the beginnings of each chunk to be modeled as updates.
 If passed as \code{character}, dates are determined by passing the minimum of
 \code{dates} as \code{from} argument, \code{max(dates)} as \code{to} argument
 and \code{chunks} as \code{by} argument in \code{\link{seq.Date}}.
