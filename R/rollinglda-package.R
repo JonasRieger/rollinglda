@@ -13,14 +13,14 @@
 #' \code{\link{economy}} Example Dataset (576 articles from Wikinews) for testing.
 #'
 #' @section Constructor:
-#' \code{as.RollingLDA} RollingLDA objects used in this package.
+#' \code{\link{as.RollingLDA}} RollingLDA objects used in this package.
 #'
 #' @section Getter:
-#' \code{getChunks} Getter for \code{\link[=as.RollingLDA]{RollingLDA}} objects.
+#' \code{\link{getChunks}} Getter for \code{\link[=as.RollingLDA]{RollingLDA}} objects.
 #'
 #' @section Modeling:
-#' \code{RollingLDA} Performing the method from scratch.
-#' \code{updateRollingLDA} Performing updates on \code{\link[=as.RollingLDA]{RollingLDA}} objects.
+#' \code{\link{RollingLDA}} Performing the method from scratch.\cr
+#' \code{\link{updateRollingLDA}} Performing updates on \code{\link[=as.RollingLDA]{RollingLDA}} objects.
 #'
 #' @references
 #' TBA
