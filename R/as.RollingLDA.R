@@ -1,6 +1,9 @@
 #' @title RollingLDA Object
 #'
 #' @description Constructor for RollingLDA objects used in this package.
+#' The function may be useful to create a RollingLDA object out of a standard
+#' \code{\link[ldaPrototype]{LDA}} object to use it as initial model and
+#' update it using \code{\link{updateRollingLDA}}.
 #'
 #' @details
 #' If you call \code{as.RollingLDA} on an object \code{x} which already is of
@@ -17,7 +20,7 @@
 #' @param id [\code{character(1)}]\cr
 #' Name for the computation/model.
 #' @param lda [\code{named list}]\cr
-#' \code{\link{LDA}} object.
+#' \code{\link[ldaPrototype]{LDA}} object.
 #' @param docs [\code{named list}]\cr
 #' Texts in a preprocessed format. See \code{\link[tosca]{LDAprep}}.
 #' @param dates [\code{(un)named Date}]\cr

@@ -19,7 +19,7 @@ overwrite elements from \code{x}.}
 Name for the computation/model.}
 
 \item{lda}{[\code{named list}]\cr
-\code{\link{LDA}} object.}
+\code{\link[ldaPrototype]{LDA}} object.}
 
 \item{docs}{[\code{named list}]\cr
 Texts in a preprocessed format. See \code{\link[tosca]{LDAprep}}.}
@@ -59,6 +59,9 @@ Should test information be given in the console?}
 }
 \description{
 Constructor for RollingLDA objects used in this package.
+The function may be useful to create a RollingLDA object out of a standard
+\code{\link[ldaPrototype]{LDA}} object to use it as initial model and
+update it using \code{\link{updateRollingLDA}}.
 }
 \details{
 If you call \code{as.RollingLDA} on an object \code{x} which already is of

@@ -10,9 +10,17 @@
 #' the (detailed) example at \url{https://github.com/JonasRieger/rollinglda}.
 #'
 #' @section Data:
-#' \code{\link{economy}} Example Dataset (576 articles) for testing.
+#' \code{\link{economy}} Example Dataset (576 articles from Wikinews) for testing.
 #'
-#' @section Constructor, Getter, Fitting: TBA ...
+#' @section Constructor:
+#' \code{as.RollingLDA} RollingLDA objects used in this package.
+#'
+#' @section Getter:
+#' \code{getChunks} Getter for \code{\link[=as.RollingLDA]{RollingLDA}} objects.
+#'
+#' @section Modeling:
+#' \code{RollingLDA} Performing the method from scratch.
+#' \code{updateRollingLDA} Performing updates on \code{\link[=as.RollingLDA]{RollingLDA}} objects.
 #'
 #' @references
 #' TBA
