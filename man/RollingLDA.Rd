@@ -16,6 +16,7 @@ RollingLDA(...)
   vocab.rel = 0,
   vocab.fallback = 100L,
   doc.abs = 0L,
+  memory.fallback = 0L,
   init,
   type = c("ldaprototype", "lda"),
   id,
@@ -69,6 +70,12 @@ relative frequency than \code{vocab.rel}. Default is 100.}
 An absolute lower bound limit for which texts are taken into account. All
 texts are considered for modeling that have more words (subsetted to words
 occurring in the vocabularies) than \code{doc.abs}. Default is 0.}
+
+\item{memory.fallback}{[\code{integer(1)}]\cr
+If there are no texts as memory in a certain chunk, \code{memory} is
+determined by going backwards the modeled texts chronologically and taking
+the date of the text at position \code{memory.fallback}.
+Default is 0, which means "end the fitting".}
 
 \item{init}{[\code{Date(1)} or \code{integer(1)}]\cr
 Date up to which the initial model should be computed. This parameter is

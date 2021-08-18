@@ -12,7 +12,8 @@ updateRollingLDA(
   chunks,
   memory,
   param = getParam(x),
-  compute.topics = TRUE
+  compute.topics = TRUE,
+  memory.fallback = 0L
 )
 
 \method{RollingLDA}{RollingLDA}(
@@ -22,7 +23,8 @@ updateRollingLDA(
   chunks,
   memory,
   param = getParam(x),
-  compute.topics = TRUE
+  compute.topics = TRUE,
+  memory.fallback = 0L
 )
 }
 \arguments{
@@ -72,7 +74,14 @@ modeled texts chronologically and taking the date of the text at position
   occurring in the vocabularies) than \code{doc.abs}.}
 }}
 
-\item{...}{additional arguments.}
+\item{compute.topics}{[\code{logical(1)}]\cr
+Should the topic matrix of the LDA model be computed? Default is \code{TRUE}.}
+
+\item{memory.fallback}{[\code{integer(1)}]\cr
+If there are no texts as memory in a certain chunk, \code{memory} is
+determined by going backwards the modeled texts chronologically and taking
+the date of the text at position \code{memory.fallback}.
+Default is 0, which means "end the fitting".}
 }
 \value{
 [\code{named list}] with entries

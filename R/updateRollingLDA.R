@@ -52,7 +52,13 @@
 #'   texts are considered for modeling that have more words (subsetted to words
 #'   occurring in the vocabularies) than \code{doc.abs}.}
 #' }
-#' @param ... additional arguments.
+#' @param compute.topics [\code{logical(1)}]\cr
+#' Should the topic matrix of the LDA model be computed? Default is \code{TRUE}.
+#' @param memory.fallback [\code{integer(1)}]\cr
+#' If there are no texts as memory in a certain chunk, \code{memory} is
+#' determined by going backwards the modeled texts chronologically and taking
+#' the date of the text at position \code{memory.fallback}.
+#' Default is 0, which means "end the fitting".
 #' @return [\code{named list}] with entries
 #'  \describe{
 #'   \item{\code{id}}{[\code{character(1)}] See above.}
@@ -72,7 +78,7 @@
 #'
 #' @export updateRollingLDA
 updateRollingLDA = function(x, texts, dates, chunks, memory, param = getParam(x),
-                            compute.topics = TRUE){
+                            compute.topics = TRUE, memory.fallback = 0L){
 
   if (!is.RollingLDA(x)){
     is.RollingLDA(x, verbose = TRUE)
@@ -125,7 +131,8 @@ updateRollingLDA = function(x, texts, dates, chunks, memory, param = getParam(x)
       dates = dates,
       memory = memory,
       param = param,
-      compute.topics = compute.topics
+      compute.topics = compute.topics,
+      memory.fallback = memory.fallback
     ))
   }else{
     for (i in seq_along(chunks)){
@@ -135,7 +142,8 @@ updateRollingLDA = function(x, texts, dates, chunks, memory, param = getParam(x)
         texts = texts[dates < chunks[i]],
         dates = dates[dates < chunks[i]],
         memory = memory[i],
-        compute.topics = FALSE
+        compute.topics = FALSE,
+        memory.fallback = memory.fallback
       )
       texts = texts[dates >= chunks[i]]
       dates = dates[dates >= chunks[i]]
@@ -153,7 +161,7 @@ updateRollingLDA = function(x, texts, dates, chunks, memory, param = getParam(x)
 }
 
 updateRollingLDA_one_step = function(x, texts, dates, memory, param = getParam(x),
-                                     compute.topics = TRUE){
+                                     compute.topics = TRUE, memory.fallback = 0L){
 
   if (!is.RollingLDA(x)){
     is.RollingLDA(x, verbose = TRUE)
@@ -168,14 +176,35 @@ updateRollingLDA_one_step = function(x, texts, dates, memory, param = getParam(x
   assert_int(vocab.rel, lower = 0, upper = 1)
   assert_int(vocab.fallback, lower = 0)
   assert_int(doc.abs, lower = 0)
+  assert_int(memory.fallback, lower = 0)
   assert_list(texts, types = "character", names = "unique")
   assert_date(memory, any.missing = FALSE, len = 1)
   assert_date(dates, any.missing = FALSE, len = length(texts), lower = memory)
 
+  if (length(dates) == 0){
+    message("there are no texts in this chunk - skip chunk")
+    warning("there are no texts in this chunk - skip chunk")
+    return(invisible(x))
+  }
+
   dates.memory = getDates(x)
   assert_date(dates, lower = max(dates.memory)+1)
 
-  ### hier prüfen auf leere chunks und leeres memory
+  if (!any(dates.memory >= memory)){
+    if (memory.fallback > 0){
+      memory = sort(dates.memory, decreasing = TRUE)[memory.fallback]
+      warning("there are no texts as memory for this chunk - ",
+                  "using \"memory.fallback\" = ", memory.fallback,
+                  " to determine memory: ", memory)
+      message("there are no texts as memory for this chunk - ",
+                  "using \"memory.fallback\" = ", memory.fallback,
+                  " to determine memory: ", memory)
+    }else{
+      warning("there are no texts as memory for this chunk - skip chunk")
+      message("there are no texts as memory for this chunk - skip chunk")
+      return(invisible(x))
+    }
+  }
 
   id.memory = names(dates.memory[dates.memory >= memory])
   docs.memory = getDocs(x, names = id.memory)

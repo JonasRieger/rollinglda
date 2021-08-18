@@ -47,6 +47,11 @@
 #' An absolute lower bound limit for which texts are taken into account. All
 #' texts are considered for modeling that have more words (subsetted to words
 #' occurring in the vocabularies) than \code{doc.abs}. Default is 0.
+#' @param memory.fallback [\code{integer(1)}]\cr
+#' If there are no texts as memory in a certain chunk, \code{memory} is
+#' determined by going backwards the modeled texts chronologically and taking
+#' the date of the text at position \code{memory.fallback}.
+#' Default is 0, which means "end the fitting".
 #' @param init [\code{Date(1)} or \code{integer(1)}]\cr
 #' Date up to which the initial model should be computed. This parameter is
 #' needed/used only if \code{chunks} is passed as \code{character}. Otherwise
@@ -85,7 +90,7 @@ RollingLDA = function(...) UseMethod("RollingLDA")
 #' @rdname RollingLDA
 #' @export
 RollingLDA.default = function(texts, dates, chunks, memory,
-  vocab.abs = 5L, vocab.rel = 0, vocab.fallback = 100L, doc.abs = 0L,
+  vocab.abs = 5L, vocab.rel = 0, vocab.fallback = 100L, doc.abs = 0L, memory.fallback = 0L,
   init, type = c("ldaprototype", "lda"), id, ...){
 
   assert_int(vocab.abs, lower = 0)
@@ -139,11 +144,16 @@ RollingLDA.default = function(texts, dates, chunks, memory,
   if (is.unsorted(memory)) stop("\"memory\" must be sorted")
 
   init = max(dates[dates < chunks[1]])
+  if (length(init) == 0) stop("\"init\" must not be smaller than the lowest date in \"dates\", but ",
+                              paste0(init, " < ", min(dates)))
   wc = .computewordcounts(texts[dates < chunks[1]])
   vocab = wc$words[wc$wordcounts > vocab.abs &
       wc$wordcounts > min(vocab.rel * sum(wc$wordcounts), vocab.fallback)]
   docs = LDAprep(texts[dates < chunks[1]], vocab)
   docs = docs[sapply(docs, ncol) > doc.abs]
+  if (length(docs) == 0){
+    stop("after preprocessing there are no texts left for the initial model")
+  }
 
   if (type == "ldaprototype"){
     message("Fitting LDAPrototype as initial model.")
@@ -181,7 +191,8 @@ RollingLDA.default = function(texts, dates, chunks, memory,
       texts = texts[dates < chunks[i]],
       dates = dates[dates < chunks[i]],
       memory = memory[i],
-      compute.topics = FALSE
+      compute.topics = FALSE,
+      memory.fallback = memory.fallback
     )
     texts = texts[dates >= chunks[i]]
     dates = dates[dates >= chunks[i]]
