@@ -11,9 +11,8 @@ is.RollingLDA(obj, verbose = FALSE)
 }
 \arguments{
 \item{x}{[\code{named list}]\cr
-Output from \code{\link[lda]{lda.collapsed.gibbs.sampler}}. Alternatively each
-element can be passed for individual results. Individually set elements
-overwrite elements from \code{x}.}
+\code{\link{RollingLDA}} object. Alternatively each element can be passed for
+individual results. Individually set elements overwrite elements from \code{x}.}
 
 \item{id}{[\code{character(1)}]\cr
 Name for the computation/model.}
@@ -33,20 +32,21 @@ Vocabularies.}
 \item{chunks}{[\code{data.table}]\cr
 with specifications for each model chunk
 \describe{
-  \item{\code{chunk.id}}{[\code{integer}] bla}
-  \item{\code{start.date}}{[\code{Date}] bla}
-  \item{\code{end.date}}{[\code{Date}] bla}
-  \item{\code{memory}}{[\code{Date}] bla}
-  \item{\code{n}}{[\code{integer}] bla}
-  \item{\code{n.dicsarded}}{[\code{integer}] bla}
-  \item{\code{n.memory}}{[\code{integer}] bla}
-  \item{\code{n.vocab}}{[\code{integer}] bla}
+  \item{\code{chunk.id}}{[\code{integer}] Index counting up starting with \code{0}.}
+  \item{\code{start.date}}{[\code{Date}] Minimum of each chunk's dates.}
+  \item{\code{end.date}}{[\code{Date}] Maximum of each chunk's dates.}
+  \item{\code{memory}}{[\code{Date}] Date from which texts are considered as memory.}
+  \item{\code{n}}{[\code{integer}] Number of fitted texts.}
+  \item{\code{n.dicsarded}}{[\code{integer}] Number of lost texts through preprocessing.}
+  \item{\code{n.memory}}{[\code{integer}] Number of texts considered as memory.}
+  \item{\code{n.vocab}}{[\code{integer}] Number of vocabularies (monotonously increasing).}
 }
 If not passed, \code{lda} is interpreted as initialization chunk.}
 
-\item{param}{[\code{named list}]\cr
-Parameters of the function call \code{\link[lda]{lda.collapsed.gibbs.sampler}}.
-List always should contain names "K", "alpha", "eta" and "num.iterations".}
+\item{param}{[\code{named list(4)}]\cr
+Parameters of the object, i.e. parameters for future updates fitted on the
+to be created model. List always should contain names "vocab.abs", "vocab.rel",
+"vocab.fallback" and "doc.abs".}
 
 \item{obj}{[\code{R} object]\cr
 Object to test.}
