@@ -135,6 +135,8 @@ updateRollingLDA = function(x, texts, dates, chunks, memory, param = getParam(x)
       memory.fallback = memory.fallback
     ))
   }else{
+    chunks = c(chunks[-1], max(dates))
+    res = x
     for (i in seq_along(chunks)){
       message("Fitting Chunk ", i, "/", length(chunks), ".")
       res = updateRollingLDA_one_step(
