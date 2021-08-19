@@ -1,7 +1,7 @@
 # rollinglda
 [![CRAN](https://www.r-pkg.org/badges/version/rollinglda)](https://cran.r-project.org/package=rollinglda)
 [![R build status](https://github.com/JonasRieger/rollinglda/workflows/R-CMD-check/badge.svg)](https://github.com/JonasRieger/rollinglda/actions)
-[![Travis-CI Build Status](https://travis-ci.org/JonasRieger/rollinglda.svg?branch=master)](https://travis-ci.org/JonasRieger/rollinglda)
+[![Travis-CI Build Status](https://travis-ci.com/JonasRieger/rollinglda.svg?branch=master)](https://travis-ci.com/JonasRieger/rollinglda)
 [![AppVeyor build status](https://ci.appveyor.com/api/projects/status/github/JonasRieger/rollinglda?branch=master&svg=true)](https://ci.appveyor.com/project/JonasRieger/rollinglda)
 [![Coverage Status](https://coveralls.io/repos/github/JonasRieger/rollinglda/badge.svg?branch=master)](https://coveralls.io/github/JonasRieger/rollinglda?branch=master)
 
