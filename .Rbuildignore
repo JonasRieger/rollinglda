@@ -1,7 +1,9 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
 ignore
-\.travis\.yml
 LICENSE
 CODE_OF_CONDUCT.md
 paper
+^\.travis\.yml$
+^appveyor\.yml$
+^\.github$
