@@ -65,6 +65,18 @@ test_that("is.RollingLDA", {
   expect_true(is.RollingLDA(init_proto_updated3))
 })
 
+test_that("is.LDA", {
+  expect_true(is.LDA(getLDA(roll_lda)))
+  expect_true(is.LDA(getLDA(roll_lda), verbose = TRUE))
+  expect_true(is.LDA(getLDA(roll_proto)))
+  expect_true(is.LDA(getLDA(roll_lda2)))
+  expect_true(is.LDA(getLDA(roll_proto2)))
+  expect_true(is.LDA(getLDA(init_proto)))
+  expect_true(is.LDA(getLDA(init_proto_updated1)))
+  expect_true(is.LDA(getLDA(init_proto_updated2)))
+  expect_true(is.LDA(getLDA(init_proto_updated3)))
+})
+
 test_that("chunks: match statistics with expactations", {
   expect_equal(getChunks(roll_lda),
                data.table(
@@ -176,4 +188,20 @@ test_that("Parameter LDA match", {
                    getParam(getLDA(roll_lda2)))
   expect_identical(getParam(getLDA(roll_proto2)),
                    getParam(getLDA(roll_lda2)))
+})
+
+test_that("print.RollingLDA", {
+  # prints not equal
+  expect_error(expect_output(print(roll_lda), capture.output(print(roll_lda2))))
+  # RollingLDA Object
+  expect_output(print(roll_lda), "RollingLDA Object")
+  expect_output(print(roll_lda2), "RollingLDA Object")
+
+  # LDA print is part of RollingLDA print
+  for(i in capture.output(print(getLDA(roll_lda)))[1:5]){
+    expect_output(print(roll_lda), i, fixed = TRUE)
+  }
+  for(i in capture.output(print(getLDA(roll_lda2)))[1:5]){
+    expect_output(print(roll_lda2), i, fixed = TRUE)
+  }
 })
