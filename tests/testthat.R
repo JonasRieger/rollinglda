@@ -5,6 +5,6 @@ Sys.setenv("R_TESTS" = "")
 
 library(testthat)
 library(rollinglda)
-#library(data.table)
+library(data.table)
 
 test_check("rollinglda")
