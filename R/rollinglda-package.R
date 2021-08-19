@@ -26,10 +26,11 @@
 #' TBA
 #'
 #' @import data.table
-#' @import stats
 #' @import checkmate
-#' @importFrom tosca LDAprep
 #' @import ldaPrototype
+#' @importFrom utils tail
+#' @importFrom tosca LDAprep
+#' @importFrom stats na.omit
 #' @importFrom lubridate is.Date
 #' @importFrom lubridate NA_Date_
 #' @importFrom lubridate period

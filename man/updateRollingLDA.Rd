@@ -13,7 +13,8 @@ updateRollingLDA(
   memory,
   param = getParam(x),
   compute.topics = TRUE,
-  memory.fallback = 0L
+  memory.fallback = 0L,
+  ...
 )
 
 \method{RollingLDA}{RollingLDA}(
@@ -24,7 +25,8 @@ updateRollingLDA(
   memory,
   param = getParam(x),
   compute.topics = TRUE,
-  memory.fallback = 0L
+  memory.fallback = 0L,
+  ...
 )
 }
 \arguments{
@@ -82,6 +84,8 @@ If there are no texts as memory in a certain chunk, \code{memory} is
 determined by going backwards the modeled texts chronologically and taking
 the date of the text at position \code{memory.fallback}.
 Default is 0, which means "end the fitting".}
+
+\item{...}{not implemented}
 }
 \value{
 [\code{named list}] with entries

@@ -59,6 +59,7 @@
 #' determined by going backwards the modeled texts chronologically and taking
 #' the date of the text at position \code{memory.fallback}.
 #' Default is 0, which means "end the fitting".
+#' @param ... not implemented
 #' @return [\code{named list}] with entries
 #'  \describe{
 #'   \item{\code{id}}{[\code{character(1)}] See above.}
@@ -78,7 +79,7 @@
 #'
 #' @export updateRollingLDA
 updateRollingLDA = function(x, texts, dates, chunks, memory, param = getParam(x),
-                            compute.topics = TRUE, memory.fallback = 0L){
+                            compute.topics = TRUE, memory.fallback = 0L, ...){
 
   if (!is.RollingLDA(x)){
     is.RollingLDA(x, verbose = TRUE)
@@ -127,7 +128,7 @@ updateRollingLDA = function(x, texts, dates, chunks, memory, param = getParam(x)
   if (length(chunks) == 1){
     return(updateRollingLDA_one_step(
       x = x,
-      texts = text,
+      texts = texts,
       dates = dates,
       memory = memory,
       param = param,
