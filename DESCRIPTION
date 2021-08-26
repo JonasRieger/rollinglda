@@ -20,6 +20,7 @@ Imports:
 	tosca (>= 0.2-0),
 	utils
 Suggests:
+	covr,
 	testthat
 RoxygenNote: 7.1.1
 LazyData: true

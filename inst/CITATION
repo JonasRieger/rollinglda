@@ -8,12 +8,12 @@ citEntry(entry = "Manual",
   author       = "Jonas Rieger",
   journal      = "Journal of Open Source Software",
   year         = year,
-  doi          = "TBA",
+  doi          = "10.5281/zenodo.5266717",
   url          = "https://github.com/JonasRieger/rollinglda",
   note         = vers,
   textVersion  =
   paste("Rieger, Jonas (", year, "). ",
         "rollinglda: Construct Consistent Time Series from Textual Data. ",
         vers, ". ",
-        "DOI: TBA.", sep = "")
+        "DOI: 10.5281/zenodo.5266717.", sep = "")
 )

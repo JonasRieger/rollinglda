@@ -139,6 +139,44 @@ test_that("types: lda, ldaprototype", {
     roll_lda2[names(roll_lda2) != "lda"])
 })
 
+test_that("init: date, ineger", {
+  # TODO
+
+  # date
+
+  # integer
+
+  # needed if chunks character
+
+  # not used if chunks dates
+})
+
+test_that("memory: character, date, integer", {
+  # TODO
+
+  # date(s)
+
+  # character
+
+  # integer
+
+  # memory empty -> warning
+
+  # memory.fallback -> warning2
+})
+
+test_that("chunks: character, date", {
+  # TODO
+
+  # date(s)
+
+  # character
+
+  # chunks empty -> warning
+
+})
+
+
 test_that("staged setting: updateRollingLDA", {
   # init_proto_updated1 and 2 are identical, but 3 is different (different seed)!
   expect_identical(init_proto_updated1, init_proto_updated2)

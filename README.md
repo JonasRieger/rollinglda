@@ -39,7 +39,7 @@ Pull requests are welcome and will be included at the discretion of the author.
 
 ## Installation
 ```{R}
-install.packages("rollinglda")
+#TBA install.packages("rollinglda")
 ```
 For the development version use [devtools](https://cran.r-project.org/package=devtools):
 ```{R}
