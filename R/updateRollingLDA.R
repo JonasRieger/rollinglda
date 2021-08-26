@@ -136,7 +136,7 @@ updateRollingLDA = function(x, texts, dates, chunks, memory, param = getParam(x)
       memory.fallback = memory.fallback
     ))
   }else{
-    chunks = c(chunks[-1], max(dates))
+    chunks = c(chunks[-1], max(dates)+1)
     res = x
     for (i in seq_along(chunks)){
       message("Fitting Chunk ", i, "/", length(chunks), ".")
@@ -255,38 +255,3 @@ updateRollingLDA_one_step = function(x, texts, dates, memory, param = getParam(x
 #' @rdname updateRollingLDA
 #' @export
 RollingLDA.RollingLDA = updateRollingLDA
-
-
-if(FALSE){
-  assert_character(as.character(memory), any.missing = FALSE)
-  if (!is.Date(memory)){
-    if (is.numeric(memory)){
-      tmp = sort(getDates(x), decreasing = TRUE)[memory]
-      message("memory = ", memory, ": using the date of the ", memory,
-              "th last text as memory, i.e ", tmp)
-      memory = tmp
-    }
-    memory.try = try(as.Date(memory), silent = TRUE)
-    if (inherits(memory.try, "try-error")){
-      memory = tolower(memory)
-      unit.memory = trimws(gsub("([0-9]*)(.*)", "\\2", memory))
-      cand = c("day", "week", "month", "quarter", "year")
-      assert_choice(unit.memory, c(cand, paste0(cand, "s")))
-      if (unit.memory %in% c("year", "years")){
-        update.start = min(dates)
-        floored = " (first new date)"
-      }else{
-        update.start = floor_date(min(dates), unit.memory)
-        floored = paste0(" (first new date floored to ", unit.memory, ")")
-      }
-      if (unit.memory %in% c("quarter", "quarters")){
-        number.quarter = gsub("([0-9]*)(.*)", "\\1", memory)
-        memory = paste0(ifelse(number.quarter == "", 3,
-                               3 * as.integer(number.quarter)), "month")
-      }
-      message("memory = ", memory, ": using texts of the last ", memory, " from ",
-              update.start, floored, " as memory, i.e. ", update.start - period(memory))
-      memory = update.start - period(memory)
-    }else memory = memory.try
-  }
-}

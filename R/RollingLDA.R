@@ -143,9 +143,11 @@ RollingLDA.default = function(texts, dates, chunks, memory,
   if (is.unsorted(chunks)) stop("\"chunks\" must be sorted")
   if (is.unsorted(memory)) stop("\"memory\" must be sorted")
 
+  if (sum(dates < chunks[1]) == 0){
+    stop("\"init\" (first element of \"chunks\" minus one day) must not be smaller than the lowest date in \"dates\", but ",
+         paste0(chunks[1]-1, " < ", min(dates)))
+  }
   init = max(dates[dates < chunks[1]])
-  if (length(init) == 0) stop("\"init\" must not be smaller than the lowest date in \"dates\", but ",
-                              paste0(init, " < ", min(dates)))
   wc = .computewordcounts(texts[dates < chunks[1]])
   vocab = wc$words[wc$wordcounts > vocab.abs &
       wc$wordcounts > min(vocab.rel * sum(wc$wordcounts), vocab.fallback)]
@@ -182,7 +184,7 @@ RollingLDA.default = function(texts, dates, chunks, memory,
 
   texts = texts[dates >= chunks[1]]
   dates = dates[dates >= chunks[1]]
-  chunks = c(chunks[-1], max(dates))
+  chunks = c(chunks[-1], max(dates)+1)
 
   for (i in seq_along(chunks)){
     message("Fitting Chunk ", i, "/", length(chunks), ".")

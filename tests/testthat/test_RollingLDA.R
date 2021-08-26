@@ -112,7 +112,7 @@ test_that("chunks: match statistics with expactations", {
                  n.discarded = as.integer(c(0, 0, 0, 0, 2, 1, 1, 0, 0)),
                  n.memory = as.integer(c(NA, 21, 105, 176, 177, 150, 132, 132, 125)),
                  n.vocab = as.integer(c(55, 547, 841, 1038, 1160, 1261, 1323, 1486, 1500)),
-                   key = colnames(getChunks(roll_lda))))
+                 key = colnames(getChunks(roll_lda))))
   expect_equal(getChunks(roll_lda)[, 1:2],
                data.table(
                  chunk.id = 0:8L,
@@ -139,8 +139,57 @@ test_that("types: lda, ldaprototype", {
     roll_lda2[names(roll_lda2) != "lda"])
 })
 
-test_that("init: date, ineger", {
+test_that("unnamed dates"){
+  seed = Sys.time()
+  set.seed(seed)
+  model1 = RollingLDA(economy_texts[1:200], unname(economy_dates[1:200]), "quarter", "6 month",
+                      init = 20, K = 5, type = "lda")
+  set.seed(seed)
+  model2 = RollingLDA(economy_texts[1:200], economy_dates[1:200], "quarter", "6 month",
+                      init = 20, K = 5, type = "lda")
+  expect_identical(model1, model2)
+
+  # keep in mind: dates must not be sorted, but are considered to be in the same
+  # order as texts
+  set.seed(seed)
+  model2 = RollingLDA(economy_texts[1:200], sort(unname(economy_dates[1:200])), "quarter", "6 month",
+                      init = 20, K = 5, type = "lda")
+  expect_error(expect_identical(model1, model2))
+}
+
+test_that("init: date, ineger, character(date)", {
   # TODO
+
+  chunk = unname(sort(economy_dates)[sample(180:220, 1)])
+  init = unname(sort(economy_dates)[sample(80:120, 1)])
+  mid = unname(sort(economy_dates)[sample(145:155, 1)])
+
+  seed = Sys.time()
+
+  # chunks as character identical to Date
+  set.seed(seed)
+  model1 = RollingLDA(economy_texts[economy_dates <= chunk], economy_dates[economy_dates <= chunk],
+                      chunks = init, memory = 20, K = 5, type = "lda")
+  set.seed(seed)
+  model2 = RollingLDA(economy_texts[economy_dates <= chunk], economy_dates[economy_dates <= chunk],
+                      chunks = as.character(init), memory = 20, K = 5, type = "lda")
+  expect_identical(model1, model2)
+
+
+  set.seed(seed)
+  model1 = RollingLDA(economy_texts[economy_dates <= chunk], economy_dates[economy_dates <= chunk],
+                      chunks = c(init, mid), memory = 20, K = 5, type = "lda", vocab.abs = 0)
+  set.seed(seed)
+  model2 = RollingLDA(economy_texts[economy_dates <= mid], economy_dates[economy_dates <= mid],
+                      chunks = init, memory = 20, K = 5, type = "lda", vocab.abs = 0)
+  model2 = RollingLDA(model2, economy_texts[economy_dates >= mid & economy_dates <= chunk],
+                      economy_dates[economy_dates >= mid & economy_dates <= chunk], memory = 20)
+  expect_identical(getChunks(model1), getChunks(model2))
+  expect_set_equal(getVocab(model1), getVocab(model2))
+  expect_set_equal(getDates(model1), getDates(model2))
+
+  economy_texts[1:200]
+  economy_dates[1:200]
 
   # date
 
@@ -149,10 +198,30 @@ test_that("init: date, ineger", {
   # needed if chunks character
 
   # not used if chunks dates
+
+  # init smaller than minimum of dates
+  expect_error(RollingLDA(economy_texts[economy_dates <= chunk], economy_dates[economy_dates <= chunk],
+                          chunks = min(economy_dates), memory = min(economy_dates) - 1, K = 5, type = "lda"),
+               "lowest date")
 })
 
-test_that("memory: character, date, integer", {
-  # TODO
+test_that("memory: character, date, integer, character(date)", {
+  chunk = unname(sort(economy_dates)[sample(180:220, 1)])
+  init = unname(sort(economy_dates)[sample(80:120, 1)])
+  seed = Sys.time()
+
+  # month = 1 month
+  set.seed(seed)
+  model1 = RollingLDA(economy_texts[economy_dates <= chunk], economy_dates[economy_dates <= chunk],
+                      chunks = init, memory = "month", K = 5, type = "lda")
+  set.seed(seed)
+  model2 = RollingLDA(economy_texts[economy_dates <= chunk], economy_dates[economy_dates <= chunk],
+                      chunks = init, memory = "1 month", K = 5, type = "lda")
+  expect_identical(model1, model2)
+
+  # 1month -> error
+  expect_error(RollingLDA(economy_texts[economy_dates <= chunk], economy_dates[economy_dates <= chunk],
+                          chunks = init, memory = "1month", K = 5, type = "lda"))
 
   # date(s)
 
@@ -165,8 +234,19 @@ test_that("memory: character, date, integer", {
   # memory.fallback -> warning2
 })
 
-test_that("chunks: character, date", {
-  # TODO
+test_that("chunks: character, date, character(date)", {
+  chunk = unname(sort(economy_dates)[sample(180:220, 1)])
+  init = unname(sort(economy_dates)[sample(80:120, 1)])
+  seed = Sys.time()
+
+  # chunks as character identical to Date
+  set.seed(seed)
+  model1 = RollingLDA(economy_texts[economy_dates <= chunk], economy_dates[economy_dates <= chunk],
+                      chunks = init, memory = 20, K = 5, type = "lda")
+  set.seed(seed)
+  model2 = RollingLDA(economy_texts[economy_dates <= chunk], economy_dates[economy_dates <= chunk],
+                      chunks = as.character(init), memory = 20, K = 5, type = "lda")
+  expect_identical(model1, model2)
 
   # date(s)
 
