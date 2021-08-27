@@ -113,7 +113,7 @@ updateRollingLDA = function(x, texts, dates, chunks, memory, param = getParam(x)
     if (inherits(memory.try, "try-error")){
       if (!grepl("[0-9]", memory)) memory = paste0("1 ", memory)
       memory = as.Date(sapply(chunks, function(x)
-        as.character(seq.Date(from = x, by = paste0("-", memory), length.out = 2)[2])))
+        as.character(seq.Date(from = x, by = paste0("-", tolower(memory)), length.out = 2)[2])))
     }
     else memory = memory.try
   }
