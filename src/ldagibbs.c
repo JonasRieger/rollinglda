@@ -13,28 +13,24 @@ error(#VAL " -- must be a length -- " #LEN " " #TYPE ".");                   \
 
 #define CHECKMATROW(VAL, TYPE, NROW) if (!isMatrix(VAL) || !is##TYPE(VAL) || NUMROWS(VAL) != NROW) { \
 error(#VAL " must be a matrix with " #NROW " rows of type " #TYPE ".");                              \
-}                                                              \
+}                                                                                                    \
 
 #define NUMROWS(MAT) (INTEGER(GET_DIM(MAT))[0])
 #define NUMCOLS(MAT) (INTEGER(GET_DIM(MAT))[1])
 
 SEXP ldagibbs(SEXP documents,
-               SEXP K_,
-               SEXP V_,
-               SEXP N_,
-               SEXP alpha_,
-               SEXP eta_,
-               SEXP initial_,
-               SEXP burnin_,
-               SEXP compute_log_likelihood_,
-               SEXP trace_,
-               SEXP freeze_topics_,
-               SEXP n_) {
+              SEXP K_,
+              SEXP V_,
+              SEXP N_,
+              SEXP alpha_,
+              SEXP eta_,
+              SEXP initial_,
+              SEXP n_) {
   GetRNGstate();
   long dd;
   int ii;
   int kk;
-  
+
   CHECK(documents, NewList);
   int nd = length(documents);
   CHECKLEN(K_, Integer, 1);
@@ -50,32 +46,22 @@ SEXP ldagibbs(SEXP documents,
   double alpha = REAL(alpha_)[0];
   CHECKLEN(eta_, Real, 1);
   double eta = REAL(eta_)[0];
-  CHECKLEN(burnin_, Integer, 1);
-  int burnin = INTEGER(burnin_)[0];
-  CHECKLEN(compute_log_likelihood_, Logical, 1);
-  int compute_log_likelihood = LOGICAL(compute_log_likelihood_)[0];
-  CHECKLEN(trace_, Integer, 1);
-  int trace = INTEGER(trace_)[0];
-  CHECKLEN(freeze_topics_, Logical, 1);
-  int freeze_topics = LOGICAL(freeze_topics_)[0];
   CHECKLEN(n_, Integer, 1);
   int n_init = INTEGER(n_)[0];
-  
+
   // init and protect output
   SEXP retval;
-  PROTECT(retval = allocVector(VECSXP, 6));
-  
+  PROTECT(retval = allocVector(VECSXP, 4));
+
   // initialisiere verschiedene Elemente
   SEXP assignments;
   SEXP topics = NULL;
   SEXP topic_sums = NULL;
-  SEXP document_expects = NULL;
   SEXP document_sums;
   SEXP initial = NULL;
   SEXP initial_topic_sums = NULL;
   SEXP initial_topics = NULL;
-  SEXP log_likelihood = NULL;
-  
+
   SET_VECTOR_ELT(retval, 0, assignments = allocVector(VECSXP, nd));
   if (!assignments) {
     error("Unable to allocate memory for assignments vector");
@@ -92,22 +78,11 @@ SEXP ldagibbs(SEXP documents,
   if (!document_sums) {
     error("Unable to allocate memory for document sums");
   }
-  if (compute_log_likelihood) {
-    SET_VECTOR_ELT(retval, 5, log_likelihood = allocMatrix(REALSXP, 2, N));
-  }
-  if (burnin < 0) {
-    error("burnin must be positive.");
-  } else if (burnin > 0) {
-    SET_VECTOR_ELT(retval, 4, document_expects = allocMatrix(INTSXP, K, nd));
-    for (ii = 0; ii < K * nd; ++ii) {
-      INTEGER(document_expects)[ii] = 0;
-    }
-  }
-  
+
   if (!isNull(initial_)) {
     CHECK(initial_, NewList);
     SEXP names = getAttrib(initial_, R_NamesSymbol);
-    
+
     for (ii = 0; ii < length(initial_); ++ii) {
       if (!strcmp(CHAR(STRING_ELT(names, ii)), "assignments")) {
         initial = VECTOR_ELT(initial_, ii);
@@ -136,42 +111,31 @@ SEXP ldagibbs(SEXP documents,
       }
     }
   }
-  
+
   if ((initial_topic_sums == NULL) ^ (initial_topics == NULL)) {
     error("initial topic sums and topics must both be specified.");
   }
-  
-  if (initial_topics == NULL) {
-    for (ii = 0; ii < K * V; ++ii) {
-      INTEGER(topics)[ii] = 0;
-    }
-  } else {
-    for (ii = 0; ii < K * V; ++ii) {
-      INTEGER(topics)[ii] = INTEGER(initial_topics)[ii];
-    }
+
+
+  for (ii = 0; ii < K * V; ++ii) {
+    INTEGER(topics)[ii] = INTEGER(initial_topics)[ii];
   }
-  if (initial_topic_sums == NULL) {
-    for (ii = 0; ii < K * length(V_); ++ii) {
-      INTEGER(topic_sums)[ii] = 0;
-    }
-  } else {
-    for (ii = 0; ii < K * length(V_); ++ii) {
-      INTEGER(topic_sums)[ii] = INTEGER(initial_topic_sums)[ii];
-    }
+  for (ii = 0; ii < K * length(V_); ++ii) {
+    INTEGER(topic_sums)[ii] = INTEGER(initial_topic_sums)[ii];
   }
-  
+
   for (ii = 0; ii < K * nd; ++ii) {
     INTEGER(document_sums)[ii] = 0;
   }
-  
+
   for (dd = 0; dd < nd; ++dd) {
     // loop over documents
     int ww;
     SEXP document = VECTOR_ELT(documents, dd);
-    
+
     // docs: erste Zeile ID, zweite Zeile Count
     CHECKMATROW(document, Integer, 2);
-    
+
     // number of words per document
     int nw = INTEGER(GET_DIM(document))[1];
     // initialisiere Vektor der Assignments
@@ -181,7 +145,7 @@ SEXP ldagibbs(SEXP documents,
     if (!zs) {
       error("Unable to allocate memory for document (%d) assignments", dd);
     }
-    
+
     for (ww = 0; ww < nw; ++ww) {
       //loop over words in document
       //id in Zeile 1
@@ -200,29 +164,14 @@ SEXP ldagibbs(SEXP documents,
       INTEGER(zs)[ww] = -1;
     }
   }
-  
+
   // Was passier hier`? Was macht R_alloc?
   // initialisiere Pointer p
   double* p = (double *)R_alloc(K, sizeof(double));
-  
-  // initialisiere iwelche Werte...
-  double const_prior = 0;
-  double const_ll = 0;
-  // offensichtlich relevant fuer die Berechnung der Likelihood
-  if (compute_log_likelihood) {
-    //                log B(\alpha)
-    const_prior = (K * lgammafn(alpha) - lgammafn(alpha * K)) * nd;
-    //                log B(\eta)
-    const_ll = (V * lgammafn(eta) - lgammafn(eta * V)) * K;
-  }
-  
+
   // beginne Loop ueber die Iterationen!
   int iteration;
   for (iteration = 0; iteration < N; ++iteration) {
-    // print Info to console
-    if (trace >= 1) {
-      REprintf("Iteration %d\n", iteration);
-    }
     // Re-Assignment, d.h. Gibbs Sampling startet hier, und zwar jeweils nur ueber
     // alle Dokumente ab n.init + 1
     for (dd = n_init; dd < nd; ++dd) {
@@ -236,12 +185,12 @@ SEXP ldagibbs(SEXP documents,
       int nw = INTEGER(GET_DIM(document))[1];
       // initialisiere initial_d dokumentenweise assignments
       SEXP initial_d = NULL;
-      
+
       if (initial != NULL) {
         initial_d = VECTOR_ELT(initial, dd);
         CHECKLEN(initial_d, Integer, nw);
       }
-      
+
       // initialisiere verschiedene Variablen per Pointer
       int* topics_p = INTEGER(topics);
       int* topic_sums_p = INTEGER(topic_sums);
@@ -250,7 +199,7 @@ SEXP ldagibbs(SEXP documents,
       int* V_p = INTEGER(V_);
       int V_l = length(V_);
       int* zs_p = INTEGER(zs);
-      
+
       for (ww = 0; ww < nw; ++ww) {
         // Loop ueber Woerter
         int* z = &zs_p[ww]; // Topiczuordnung fuer Wort
@@ -259,7 +208,7 @@ SEXP ldagibbs(SEXP documents,
         int* topic_wk;
         int* topic_k;
         int* document_k;
-        
+
         word = document_p[ww * 2]; // setze word ID
         long partialsum = 0;
         int topic_index = -1;
@@ -276,28 +225,25 @@ SEXP ldagibbs(SEXP documents,
           error("Oops I did it again");
         }
         count = document_p[ww * 2 + 1]; // setze word Count
-        
+
         // in allen Iterationen bis auf der ersten, oder?!
         if (*z != -1) {
           topic_wk = &topics_p[(*z) + K * word];
           topic_k = &topic_sums_p[*z + K * topic_index];
-          if(!freeze_topics)
-          {
-            *topic_wk -= count;
-            *topic_k -= count;
-          }
+          *topic_wk -= count;
+          *topic_k -= count;
           document_k = &document_sums_p[K * dd + *z];
           *document_k -= count;
-          
+
           if (*topic_wk < 0 || *topic_k < 0 || *document_k < 0) {
             error("Counts became negative for word (%ld): (%d, %d, %d)",
                   word, *topic_wk, *topic_k, *document_k);
           }
         }
-        
+
         double r = unif_rand();
         double p_sum = 0.0;
-        
+
         if (*z == -1) {
           for (kk = 0; kk < K; ++kk) {
             if (initial != NULL) {
@@ -323,7 +269,7 @@ SEXP ldagibbs(SEXP documents,
           for (kk = 0; kk < K; ++kk) p[kk]=1.0/K;
           REprintf("Warning:Sum of probabilities is zero, assigning equal probabilities.\n");
         }
-        
+
         *z = -1;
         for (kk = 0; kk < K; ++kk) { // Re-Assignment Strategie:
           // Wann wird r das erste Mal ueberdie kumulierten Wkeiten ueberschritten
@@ -333,7 +279,7 @@ SEXP ldagibbs(SEXP documents,
           }
           r -= p[kk] / p_sum;
         }
-        
+
         // sollte nicht vorkommen!!
         if (*z == -1) {
           for (kk = 0; kk < K; ++kk) {
@@ -341,47 +287,13 @@ SEXP ldagibbs(SEXP documents,
           }
           error("This should not have happened (%g).", r);
         }
-        
-        if (!freeze_topics){
-          topics_p[*z + K * word] += count;
-          topic_sums_p[*z + K * topic_index] += count;
-        }
+        topics_p[*z + K * word] += count;
+        topic_sums_p[*z + K * topic_index] += count;
         document_sums_p[K * dd + *z] += count;
-        if (burnin > 0 && iteration > burnin) {
-          INTEGER(document_expects)[K * dd + *z] += count;
-        }
       }
-    }
-    
-    //Compute the likelihoods:
-    if (compute_log_likelihood) {
-      double doc_ll = 0;
-      for (dd = 0; dd < nd; ++dd) {
-        double sum = alpha * K;
-        for (kk = 0; kk < K; ++kk) {
-          doc_ll += lgammafn(INTEGER(document_sums)[K * dd + kk] + alpha);
-          sum += INTEGER(document_sums)[K * dd + kk];
-        }
-        doc_ll -= lgammafn(sum);
-      }
-      double topic_ll = 0;
-      for (kk = 0; kk < K; ++kk) {
-        double sum = eta * V;
-        for (ii = 0; ii < V; ++ii) {
-          topic_ll += lgammafn(INTEGER(topics)[kk + K * ii] + eta);
-          sum += INTEGER(topics)[kk + K * ii];
-        }
-        topic_ll -= lgammafn(sum);
-      }
-      if (trace >= 2) {
-        REprintf("ll: %g + %g - %g - %g = %g\n", doc_ll, topic_ll, const_ll, const_prior,
-                 doc_ll + topic_ll - const_ll - const_prior);
-      }
-      REAL(log_likelihood)[2 * iteration] = doc_ll - const_prior + topic_ll - const_ll;
-      REAL(log_likelihood)[2 * iteration + 1] = topic_ll - const_ll;
     }
   }
-  
+
   PutRNGstate();
   UNPROTECT(1);
   return retval;

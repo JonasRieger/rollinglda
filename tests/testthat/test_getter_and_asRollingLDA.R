@@ -76,14 +76,3 @@ test_that("as.RollingLDA", {
     "not a RollingLDA object"
   )
 })
-
-test_that("log.likelihoods", {
-  # log.likelohoods not computed...
-  set.seed(seed)
-  expect_identical(
-    roll_proto,
-    RollingLDA(economy_texts, economy_dates, "quarter", "6 month",
-               init = 20, K = 5, n = 10, compute.log.likelihood = TRUE)
-  )
-})
-
