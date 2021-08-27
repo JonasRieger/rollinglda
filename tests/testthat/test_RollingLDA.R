@@ -62,6 +62,20 @@ test_that("is.RollingLDA", {
   expect_true(is.RollingLDA(init_proto_updated1))
   expect_true(is.RollingLDA(init_proto_updated2))
   expect_true(is.RollingLDA(init_proto_updated3))
+
+  # no docs left after preproc
+  expect_error(RollingLDA(economy_texts, economy_dates, "quarter", "6 month",
+                          init = 20, K = 5, doc.abs = 600, type = "lda"),
+               "after preprocessing there are no texts left for the initial model")
+  expect_error(RollingLDA(economy_texts, economy_dates, "quarter", "6 month",
+                          init = 20, K = 5, doc.abs = 60, type = "lda"),
+               "after preprocessing there is only one text left for the initial model")
+  expect_error(RollingLDA(economy_texts, economy_dates, "quarter", "6 month",
+                      init = 20, K = 5, vocab.abs = 40, type = "lda"),
+               "Assertion on 'vocab' failed")
+  expect_error(RollingLDA(economy_texts, economy_dates, "quarter", "6 month",
+                          init = 20, K = 5, vocab.abs = 41, type = "lda"),
+               "after preprocessing there is only one text left for the initial model")
 })
 
 test_that("is.LDA", {

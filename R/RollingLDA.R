@@ -156,6 +156,9 @@ RollingLDA.default = function(texts, dates, chunks, memory,
   if (length(docs) == 0){
     stop("after preprocessing there are no texts left for the initial model")
   }
+  if (length(docs) == 1){
+    stop("after preprocessing there is only one text left for the initial model")
+  }
 
   if (type == "ldaprototype"){
     message("Fitting LDAPrototype as initial model.")
