@@ -1,6 +1,12 @@
 language: r
 cache: packages
 
+os: linux
+arch:
+  - arm64
+  - ppc64le
+  - s390x
+
 r:
   - release
   - devel
