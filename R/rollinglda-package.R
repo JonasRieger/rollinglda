@@ -33,7 +33,6 @@
 #' @importFrom stats na.omit
 #' @importFrom lubridate is.Date
 #' @importFrom lubridate NA_Date_
-#' @importFrom lubridate period
 #' @useDynLib rollinglda, .registration=TRUE
 "_PACKAGE"
 
