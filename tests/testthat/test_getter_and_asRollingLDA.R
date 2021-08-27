@@ -75,4 +75,29 @@ test_that("as.RollingLDA", {
     as.RollingLDA(getLDA(roll_proto)),
     "not a RollingLDA object"
   )
+  expect_error(
+    as.RollingLDA(lda = roll_proto),
+    "not an LDA object"
+  )
+
+  # lda, dates, docs is minimum:
+  tmp = as.RollingLDA(
+    lda = getLDA(roll_proto),
+    dates = getDates(roll_proto),
+    docs = getDocs(roll_proto))
+  expect_error(
+    as.RollingLDA(
+      dates = getDates(roll_proto),
+      docs = getDocs(roll_proto)), "lda"
+  )
+  expect_error(
+    as.RollingLDA(
+      lda = getLDA(roll_proto),
+      docs = getDocs(roll_proto)), "dates"
+  )
+  expect_error(
+    as.RollingLDA(
+      lda = getLDA(roll_proto),
+      dates = getDates(roll_proto)), "docs"
+  )
 })
