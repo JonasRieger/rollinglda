@@ -75,7 +75,7 @@ test_that("is.RollingLDA", {
                "Assertion on 'vocab' failed")
   expect_error(RollingLDA(economy_texts, economy_dates, "quarter", "6 month",
                           init = 20, K = 5, vocab.abs = 41, type = "lda"),
-               "after preprocessing there is only one text left for the initial model")
+               "after preprocessing there are no texts left for the initial model")
 })
 
 test_that("is.LDA", {
@@ -311,11 +311,14 @@ test_that("memory: character, date, integer, character(date)", {
                                 chunks = range(economy_dates[economy_dates >= mid & economy_dates <= chunk])))
 
   # should be fine:
+  seed = Sys.time()
+  set.seed(seed)
   model4 = updateRollingLDA(model3,
                             economy_texts[economy_dates >= mid & economy_dates <= chunk],
                             economy_dates[economy_dates >= mid & economy_dates <= chunk],
                             chunks = range(economy_dates[economy_dates >= mid & economy_dates <= chunk]),
                             memory = 4)
+  set.seed(seed)
   model5 = updateRollingLDA(model3,
                             economy_texts[economy_dates >= mid & economy_dates <= chunk],
                             unname(economy_dates[economy_dates >= mid & economy_dates <= chunk]),

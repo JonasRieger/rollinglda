@@ -62,8 +62,8 @@ test_that("as.RollingLDA", {
     "Assertion on 'names' failed"
   )
   expect_error(
-    as.RollingLDA(roll_proto, dates = getDates(roll_proto, sample(getNames(roll_proto), 10))),
-    "do not know how to convert"
+    as.RollingLDA(roll_proto, docs = getDocs(roll_proto, sample(getNames(roll_proto), 10))),
+    "Assertion on 'names' failed"
   )
   expect_error(
     as.RollingLDA(roll_proto, param = "abc"),
