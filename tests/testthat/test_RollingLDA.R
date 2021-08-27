@@ -276,6 +276,7 @@ test_that("chunks: character, date, character(date)", {
 
   chunk = unname(sort(economy_dates)[sample(180:220, 1)])
   init = unname(sort(economy_dates)[sample(80:120, 1)])
+  memory1 = seq.Date(from = init, by = "-1 month", length.out = 2)[2]
   seed = Sys.time()
 
   # chunks as character identical to Date
