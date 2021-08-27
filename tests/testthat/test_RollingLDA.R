@@ -182,8 +182,8 @@ test_that("init: date, ineger, character(date)", {
   model2 = RollingLDA(model2, economy_texts[economy_dates >= mid & economy_dates <= chunk],
                       economy_dates[economy_dates >= mid & economy_dates <= chunk], memory = 20)
   expect_identical(getChunks(model1), getChunks(model2))
-  expect_set_equal(getVocab(model1), getVocab(model2))
-  expect_set_equal(getDates(model1), getDates(model2))
+  expect_setequal(getVocab(model1), getVocab(model2))
+  expect_setequal(getDates(model1), getDates(model2))
 
   # needed if chunks character
   expect_error(RollingLDA(economy_texts[economy_dates < mid], economy_dates[economy_dates < mid],
@@ -302,11 +302,12 @@ test_that("chunks: character, date, character(date)", {
 
   # chunks unsorted
   expect_error(RollingLDA(economy_texts[economy_dates <= chunk], economy_dates[economy_dates <= chunk],
-                          chunks = c(init, mid), memory = c(memory1, mid+1), K = 5, type = "lda"),
-               "\"memory\" must be sorted")
-
-  # chunks empty -> warning
-
+                          chunks = c(init, init-1), memory = c(memory1, memory1), K = 5, type = "lda"),
+               "\"chunks\" must be sorted")
+  # chunks rep -> empty chunk -> warning
+  expect_warning(RollingLDA(economy_texts[economy_dates <= chunk], economy_dates[economy_dates <= chunk],
+                      chunks = c(init, init), memory = c(memory1, memory1), K = 5, type = "lda"),
+                 "there are no texts in this chunk - skip chunk")
 })
 
 
