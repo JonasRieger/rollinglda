@@ -217,33 +217,46 @@ test_that("memory: character, date, integer, character(date)", {
 
   # month = 1 month
   set.seed(seed)
-  model1 = RollingLDA(economy_texts[economy_dates <= chunk], economy_dates[economy_dates <= chunk],
+  model1 = RollingLDA(economy_texts[economy_dates < mid], economy_dates[economy_dates < mid],
                       chunks = init, memory = "month", K = 5, type = "lda")
   set.seed(seed)
-  model2 = RollingLDA(economy_texts[economy_dates <= chunk], economy_dates[economy_dates <= chunk],
+  model2 = RollingLDA(economy_texts[economy_dates < mid], economy_dates[economy_dates < mid],
                       chunks = init, memory = "1 month", K = 5, type = "lda")
   set.seed(seed)
   # tolower works
-  model3 = RollingLDA(economy_texts[economy_dates <= chunk], economy_dates[economy_dates <= chunk],
+  model3 = RollingLDA(economy_texts[economy_dates < mid], economy_dates[economy_dates < mid],
                       chunks = init, memory = "1 mOnTh", K = 5, type = "lda")
   set.seed(seed)
   # date(s) = character dates
   memory1 = seq.Date(from = init, by = "-1 month", length.out = 2)[2]
-  model4 = RollingLDA(economy_texts[economy_dates <= chunk], economy_dates[economy_dates <= chunk],
+  model4 = RollingLDA(economy_texts[economy_dates < mid], economy_dates[economy_dates < mid],
                       chunks = init, memory = memory1, K = 5, type = "lda")
   set.seed(seed)
   # character-date
-  model5 = RollingLDA(economy_texts[economy_dates <= chunk], economy_dates[economy_dates <= chunk],
+  model5 = RollingLDA(economy_texts[economy_dates < mid], economy_dates[economy_dates < mid],
                       chunks = init, memory = as.character(memory1), K = 5, type = "lda")
   expect_identical(model1, model2)
   expect_identical(model1, model3)
   expect_identical(model1, model4)
   expect_identical(model1, model5)
+  seed = Sys.time()
+  set.seed(seed)
+  model1 = updateRollingLDA(model1,
+                            economy_texts[economy_dates >= mid & economy_dates <= chunk],
+                            economy_dates[economy_dates >= mid & economy_dates <= chunk],
+                            memory = "month")
+  set.seed(seed)
+  model2 = updateRollingLDA(model2,
+                            economy_texts[economy_dates >= mid & economy_dates <= chunk],
+                            economy_dates[economy_dates >= mid & economy_dates <= chunk],
+                            memory = "1 month")
+  expect_identical(model1, model2)
 
   # memory unsorted
   expect_error(RollingLDA(economy_texts[economy_dates <= chunk], economy_dates[economy_dates <= chunk],
                           chunks = c(init, mid), memory = c(memory1, memory1-1), K = 5, type = "lda"),
                "\"memory\" must be sorted")
+
   # memory > chunks
   expect_error(RollingLDA(economy_texts[economy_dates <= chunk], economy_dates[economy_dates <= chunk],
                           chunks = c(init, mid), memory = c(memory1, mid+1), K = 5, type = "lda"),
@@ -269,6 +282,53 @@ test_that("memory: character, date, integer, character(date)", {
   # memory vector
   expect_error(RollingLDA(economy_texts[economy_dates <= chunk], economy_dates[economy_dates <= chunk],
                           chunks = c(init, mid), memory = c(memory1, "12"), K = 5, type = "lda"))
+
+  ## updateRollingLDA ##
+  # not RollingLDA object
+  expect_error(updateRollingLDA(economy_texts[economy_dates >= mid & economy_dates <= chunk],
+                                economy_dates[economy_dates >= mid & economy_dates <= chunk],
+                                chunks = range(economy_dates[economy_dates >= mid & economy_dates <= chunk]),
+                                memory = 4), "not a RollingLDA object")
+
+  # memory missing
+  expect_error(updateRollingLDA(model3,
+                                economy_texts[economy_dates >= mid & economy_dates <= chunk],
+                                economy_dates[economy_dates >= mid & economy_dates <= chunk],
+                                chunks = range(economy_dates[economy_dates >= mid & economy_dates <= chunk])))
+
+  # should be fine:
+  model4 = updateRollingLDA(model3,
+                            economy_texts[economy_dates >= mid & economy_dates <= chunk],
+                            economy_dates[economy_dates >= mid & economy_dates <= chunk],
+                            chunks = range(economy_dates[economy_dates >= mid & economy_dates <= chunk]),
+                            memory = 4)
+  # should be fine:
+  model4 = updateRollingLDA(model3,
+                            economy_texts[economy_dates >= mid & economy_dates <= chunk],
+                            economy_dates[economy_dates >= mid & economy_dates <= chunk],
+                            chunks = as.character(range(economy_dates[economy_dates >= mid & economy_dates <= chunk])),
+                            memory = range(economy_dates[economy_dates >= mid & economy_dates <= chunk])-10)
+  # memory unsorted
+  expect_error(updateRollingLDA(model3,
+                                economy_texts[economy_dates >= mid & economy_dates <= chunk],
+                                economy_dates[economy_dates >= mid & economy_dates <= chunk],
+                                chunks = range(economy_dates[economy_dates >= mid & economy_dates <= chunk]),
+                                memory = c(min(economy_dates[economy_dates >= mid & economy_dates <= chunk]),
+                                           min(economy_dates[economy_dates >= mid & economy_dates <= chunk])-1)),
+               "\"memory\" must be sorted")
+  # memory > chunks
+  expect_error(updateRollingLDA(model3,
+                                economy_texts[economy_dates >= mid & economy_dates <= chunk],
+                                economy_dates[economy_dates >= mid & economy_dates <= chunk],
+                                chunks = range(economy_dates[economy_dates >= mid & economy_dates <= chunk]),
+                                memory = range(economy_dates[economy_dates >= mid & economy_dates <= chunk])+1),
+               "\"memory\" must not be greater than the pendant in \"chunks\"")
+  # chunks unsorted
+  expect_error(updateRollingLDA(model3,
+                                economy_texts[economy_dates >= mid & economy_dates <= chunk],
+                                economy_dates[economy_dates >= mid & economy_dates <= chunk],
+                                chunks = rev(range(economy_dates[economy_dates >= mid & economy_dates <= chunk])),
+                                memory = 4), "\"chunks\" must be sorted")
 })
 
 test_that("chunks: character, date, character(date)", {
@@ -307,7 +367,7 @@ test_that("chunks: character, date, character(date)", {
                "\"chunks\" must be sorted")
   # chunks rep -> empty chunk -> warning
   expect_warning(RollingLDA(economy_texts[economy_dates <= chunk], economy_dates[economy_dates <= chunk],
-                      chunks = c(init, init), memory = c(memory1, memory1), K = 5, type = "lda"),
+                            chunks = c(init, init), memory = c(memory1, memory1), K = 5, type = "lda"),
                  "there are no texts in this chunk - skip chunk")
 })
 
