@@ -3,6 +3,8 @@ context("as.RollingLDA and Getter")
 data("economy_texts")
 data("economy_dates")
 
+seed = Sys.Date()
+set.seed(seed)
 roll_proto = RollingLDA(economy_texts, economy_dates, "quarter", "6 month",
                         init = 20, K = 5, n = 10)
 
@@ -68,6 +70,20 @@ test_that("as.RollingLDA", {
   expect_error(
     as.RollingLDA(roll_proto, param = "abc"),
     "input arguments do not create a RollingLDA object"
+  )
+  expect_error(
+    as.RollingLDA(getLDA(roll_proto)),
+    "not a RollingLDA object"
+  )
+})
+
+test_that("log.likelihoods", {
+  # log.likelohoods not computed...
+  set.seed(seed)
+  expect_identical(
+    roll_proto,
+    RollingLDA(economy_texts, economy_dates, "quarter", "6 month",
+               init = 20, K = 5, n = 10, compute.log.likelihood = TRUE)
   )
 })
 
