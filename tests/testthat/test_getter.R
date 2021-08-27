@@ -8,4 +8,6 @@ roll_proto = RollingLDA(economy_texts, economy_dates, "quarter", "6 month",
 
 test_that("bla", {
 
+  getNames(reverse = TRUE)
+
 })

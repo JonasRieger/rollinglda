@@ -167,7 +167,7 @@ RollingLDA.default = function(texts, dates, chunks, memory,
   }
 
   res = list(id = id, lda = lda,
-    docs = docs, dates = dates[dates < chunks[1]], vocab = vocab,
+    docs = docs, dates = dates[na.omit(match(names(docs), names(dates)))], vocab = vocab,
     chunks = data.table(
       chunk.id = 0L,
       start.date = min(dates),

@@ -302,6 +302,12 @@ test_that("memory: character, date, integer, character(date)", {
                             economy_dates[economy_dates >= mid & economy_dates <= chunk],
                             chunks = range(economy_dates[economy_dates >= mid & economy_dates <= chunk]),
                             memory = 4)
+  model5 = updateRollingLDA(model3,
+                            economy_texts[economy_dates >= mid & economy_dates <= chunk],
+                            unname(economy_dates[economy_dates >= mid & economy_dates <= chunk]),
+                            chunks = range(economy_dates[economy_dates >= mid & economy_dates <= chunk]),
+                            memory = 4)
+  expect_identical(model4, model5)
   # should be fine:
   model4 = updateRollingLDA(model3,
                             economy_texts[economy_dates >= mid & economy_dates <= chunk],
