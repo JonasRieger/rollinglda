@@ -6,7 +6,6 @@ vers = paste("R package version", meta$Version)
 citEntry(entry = "Manual",
   title        = "{rollinglda}: Construct Consistent Time Series from Textual Data",
   author       = "Jonas Rieger",
-  journal      = "Journal of Open Source Software",
   year         = year,
   doi          = "10.5281/zenodo.5266717",
   url          = "https://github.com/JonasRieger/rollinglda",

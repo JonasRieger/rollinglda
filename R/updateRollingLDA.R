@@ -77,6 +77,27 @@
 #'   \code{doc.abs} [\code{integer(1)}]. See above for explanation.}
 #' }
 #'
+#' @examples
+#' \donttest{
+#' roll_lda = RollingLDA(texts = economy_texts[economy_dates < "2008-05-01"],
+#'                       dates = economy_dates[economy_dates < "2008-05-01"],
+#'                       chunks = "month",
+#'                       memory = "month",
+#'                       init = 100,
+#'                       K = 10,
+#'                       type = "lda")
+#'
+#' # updateRollingLDA = RollingLDA, if first argument is a RollingLDA object
+#' roll_update = RollingLDA(roll_lda,
+#'                          texts = economy_texts[economy_dates >= "2008-05-01"],
+#'                          dates = economy_dates[economy_dates >= "2008-05-01"],
+#'                          chunks = "month",
+#'                          memory = "month")
+#'
+#' roll_update
+#' getChunks(roll_update)
+#' }
+#'
 #' @export updateRollingLDA
 updateRollingLDA = function(x, texts, dates, chunks, memory, param = getParam(x),
                             compute.topics = TRUE, memory.fallback = 0L, ...){

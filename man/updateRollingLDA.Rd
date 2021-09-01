@@ -116,6 +116,28 @@ models new texts with a specified memory as initialization of the new LDA chunk.
 The function returns a \code{\link{RollingLDA}} object. You can receive results and
 all other elements of this object with getter functions (see \code{\link{getChunks}}).
 }
+\examples{
+\donttest{
+roll_lda = RollingLDA(texts = economy_texts[economy_dates < "2008-05-01"],
+                      dates = economy_dates[economy_dates < "2008-05-01"],
+                      chunks = "month",
+                      memory = "month",
+                      init = 100,
+                      K = 10,
+                      type = "lda")
+
+# updateRollingLDA = RollingLDA, if first argument is a RollingLDA object
+roll_update = RollingLDA(roll_lda,
+                         texts = economy_texts[economy_dates >= "2008-05-01"],
+                         dates = economy_dates[economy_dates >= "2008-05-01"],
+                         chunks = "month",
+                         memory = "month")
+
+roll_update
+getChunks(roll_update)
+}
+
+}
 \seealso{
 Other RollingLDA functions: 
 \code{\link{RollingLDA}()},

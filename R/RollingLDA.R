@@ -84,14 +84,43 @@
 #'   \code{doc.abs} [\code{integer(1)}]. See above for explanation.}
 #' }
 #'
+#' @examples
+#' \donttest{
+#' roll_lda = RollingLDA(texts = economy_texts,
+#'                       dates = economy_dates,
+#'                       chunks = "quarter",
+#'                       memory = "3 quarter",
+#'                       init = "2008-07-03",
+#'                       K = 10,
+#'                       type = "lda")
+#'
+#' roll_lda
+#' getChunks(roll_lda)
+#' getLDA(roll_lda)
+#'
+#' roll_proto = RollingLDA(texts = economy_texts,
+#'                         dates = economy_dates,
+#'                         chunks = "quarter",
+#'                         memory = "3 quarter",
+#'                         init = "2007-07-03",
+#'                         K = 10,
+#'                         n = 12,
+#'                         pm.backend = "socket",
+#'                         ncpus = 4)
+#'
+#' roll_proto
+#' getChunks(roll_proto)
+#' getLDA(roll_proto)
+#' }
+#'
 #' @export RollingLDA
 RollingLDA = function(...) UseMethod("RollingLDA")
 
 #' @rdname RollingLDA
 #' @export
 RollingLDA.default = function(texts, dates, chunks, memory,
-  vocab.abs = 5L, vocab.rel = 0, vocab.fallback = 100L, doc.abs = 0L, memory.fallback = 0L,
-  init, type = c("ldaprototype", "lda"), id, ...){
+                              vocab.abs = 5L, vocab.rel = 0, vocab.fallback = 100L, doc.abs = 0L, memory.fallback = 0L,
+                              init, type = c("ldaprototype", "lda"), id, ...){
 
   assert_int(vocab.abs, lower = 0)
   assert_int(vocab.rel, lower = 0, upper = 1)
@@ -150,7 +179,7 @@ RollingLDA.default = function(texts, dates, chunks, memory,
   init = max(dates[dates < chunks[1]])
   wc = .computewordcounts(texts[dates < chunks[1]])
   vocab = wc$words[wc$wordcounts > vocab.abs &
-      wc$wordcounts > min(vocab.rel * sum(wc$wordcounts), vocab.fallback)]
+                     wc$wordcounts > min(vocab.rel * sum(wc$wordcounts), vocab.fallback)]
   docs = LDAprep(texts[dates < chunks[1]], vocab)
   docs = docs[sapply(docs, ncol) > doc.abs]
   if (length(docs) == 0){
@@ -170,19 +199,19 @@ RollingLDA.default = function(texts, dates, chunks, memory,
   }
 
   res = list(id = id, lda = lda,
-    docs = docs, dates = dates[na.omit(match(names(docs), names(dates)))], vocab = vocab,
-    chunks = data.table(
-      chunk.id = 0L,
-      start.date = min(dates),
-      end.date = init,
-      memory = NA_Date_,
-      n = length(docs),
-      n.discarded = sum(dates < chunks[1]) - length(docs),
-      n.memory = NA_integer_,
-      n.vocab = length(vocab)
-    ),
-    param = list(vocab.abs = vocab.abs, vocab.rel = vocab.rel,
-      vocab.fallback = vocab.fallback, doc.abs = doc.abs))
+             docs = docs, dates = dates[na.omit(match(names(docs), names(dates)))], vocab = vocab,
+             chunks = data.table(
+               chunk.id = 0L,
+               start.date = min(dates),
+               end.date = init,
+               memory = NA_Date_,
+               n = length(docs),
+               n.discarded = sum(dates < chunks[1]) - length(docs),
+               n.memory = NA_integer_,
+               n.vocab = length(vocab)
+             ),
+             param = list(vocab.abs = vocab.abs, vocab.rel = vocab.rel,
+                          vocab.fallback = vocab.fallback, doc.abs = doc.abs))
   class(res) = "RollingLDA"
 
   texts = texts[dates >= chunks[1]]

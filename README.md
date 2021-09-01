@@ -6,7 +6,7 @@
 [![DOI](https://zenodo.org/badge/392967136.svg)](https://zenodo.org/badge/latestdoi/392967136)
 
 ## Construct Consistent Time Series from Textual Data
-RollingLDA is a rolling version of the Latent Dirichlet Allocation. By an sequential approach, it enables the construction of LDA-based time series of topics that are consistent with previous states of LDA models. After an initial modeling, updates can be computed efficiently, allowing for real-time monitoring and detection of events or structural breaks.
+RollingLDA is a rolling version of the Latent Dirichlet Allocation. By a sequential approach, it enables the construction of LDA-based time series of topics that are consistent with previous states of LDA models. After an initial modeling, updates can be computed efficiently, allowing for real-time monitoring and detection of events or structural breaks.
 
 ## Citation
 Please cite the package using the BibTeX entry, which is obtained by the call ``citation("rollinglda")``.

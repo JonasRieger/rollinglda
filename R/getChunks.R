@@ -1,6 +1,7 @@
 #' @title Getter for RollingLDA
 #'
-#' @description TBA
+#' @description
+#' Returns the corresponding element of a \code{\link{RollingLDA}} object.
 #'
 #' @param x [\code{named list}]\cr
 #' \code{\link{RollingLDA}} object.

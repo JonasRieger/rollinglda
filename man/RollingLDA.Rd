@@ -121,6 +121,36 @@ initialization of each model chunk.
 The function returns a \code{RollingLDA} object. You can receive results and
 all other elements of this object with getter functions (see \code{\link{getChunks}}).
 }
+\examples{
+\donttest{
+roll_lda = RollingLDA(texts = economy_texts,
+                      dates = economy_dates,
+                      chunks = "quarter",
+                      memory = "3 quarter",
+                      init = "2008-07-03",
+                      K = 10,
+                      type = "lda")
+
+roll_lda
+getChunks(roll_lda)
+getLDA(roll_lda)
+
+roll_proto = RollingLDA(texts = economy_texts,
+                        dates = economy_dates,
+                        chunks = "quarter",
+                        memory = "3 quarter",
+                        init = "2007-07-03",
+                        K = 10,
+                        n = 12,
+                        pm.backend = "socket",
+                        ncpus = 4)
+
+roll_proto
+getChunks(roll_proto)
+getLDA(roll_proto)
+}
+
+}
 \seealso{
 Other RollingLDA functions: 
 \code{\link{as.RollingLDA}()},

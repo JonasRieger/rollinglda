@@ -49,6 +49,22 @@
 #' Should test information be given in the console?
 #' @return [\code{named list}] \code{\link{RollingLDA}} object.
 #'
+#' @examples
+#' \donttest{
+#' roll_lda = RollingLDA(texts = economy_texts,
+#'                       dates = economy_dates,
+#'                       chunks = "quarter",
+#'                       memory = "3 quarter",
+#'                       init = "2008-07-03",
+#'                       K = 10,
+#'                       type = "lda")
+#'
+#' is.RollingLDA(roll_lda, verbose = TRUE)
+#' getID(roll_lda)
+#' roll_lda = as.RollingLDA(roll_lda, id = "newID")
+#' getID(roll_lda)
+#' }
+#'
 #' @export as.RollingLDA
 as.RollingLDA = function(x, id, lda, docs, dates, vocab, chunks, param){
   if (!missing(x)){
@@ -126,7 +142,6 @@ is.RollingLDA = function(obj, verbose = FALSE){
   }
   if (!test_set_equal(names(obj), testNames)){
     if (verbose) message(check_set_equal(names(obj), testNames))
-    #message("object does not contain exactly the list elements of a \"RollingLDA\" object")
     return(FALSE)
   }
 
@@ -141,8 +156,9 @@ is.RollingLDA = function(obj, verbose = FALSE){
 
   #lda
   if (verbose) message("lda: ", appendLF = FALSE)
-  lda = try(getLDA(obj, reduce = FALSE), silent = verbose)
+  lda = try(getLDA(obj), silent = !verbose)
   if(inherits(lda, "try-error")){
+    # should not happen
     return(FALSE)
   }
   if(!is.LDA(lda)){
@@ -160,9 +176,11 @@ is.RollingLDA = function(obj, verbose = FALSE){
   }
   if (!all(sapply(docs, nrow) == 2)){
     if (verbose) message("not all elements have two rows")
+    return(FALSE)
   }
   if (!all(sapply(docs, function(x) all(x[2,] == 1)))){
     if (verbose) message("not all values in the second row equal 1")
+    return(FALSE)
   }
   if (verbose) message("checked")
 
@@ -178,7 +196,9 @@ is.RollingLDA = function(obj, verbose = FALSE){
     return(FALSE)
   }
   if (length(dates) != length(docs)){
+    # should not happen
     if (verbose) message("not same length as \"docs\"")
+    return(FALSE)
   }
   if (verbose) message("checked")
 

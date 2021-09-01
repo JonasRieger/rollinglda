@@ -47,7 +47,7 @@ See \code{\link[ldaPrototype:getSCLOP]{getLDA}}}
 See \code{\link[ldaPrototype:getSCLOP]{getLDA}}}
 }
 \description{
-TBA
+Returns the corresponding element of a \code{\link{RollingLDA}} object.
 }
 \seealso{
 Other RollingLDA functions: 

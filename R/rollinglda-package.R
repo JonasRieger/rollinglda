@@ -1,7 +1,7 @@
 #' @title rollinglda: Construct Consistent Time Series from Textual Data
 #'
 #' @description RollingLDA is a rolling version of the Latent Dirichlet
-#' Allocation (LDA). By an sequential approach, it enables the construction of
+#' Allocation (LDA). By a sequential approach, it enables the construction of
 #' LDA-based time series of topics that are consistent with previous states of
 #' LDA models. After an initial modeling, updates can be computed efficiently,
 #' allowing for real-time monitoring and detection of events or structural breaks.\cr
@@ -23,7 +23,10 @@
 #' \code{\link{updateRollingLDA}} Performing updates on \code{\link[=as.RollingLDA]{RollingLDA}} objects.
 #'
 #' @references
-#' TBA
+#' Rieger, Jonas, Carsten Jentsch and Jörg Rahnenführer (2021).
+#' "RollingLDA: An Update Algorithm of Latent Dirichlet Allocation to Construct
+#' Consistent Time Series from Textual Data". Accepted for \emph{Findings of EMNLP 2021}.
+#' URL \url{https://github.com/JonasRieger/emnlp2021}.
 #'
 #' @import data.table
 #' @import checkmate

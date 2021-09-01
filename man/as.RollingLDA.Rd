@@ -69,6 +69,23 @@ the structure of an \code{RollingLDA} object (in particular a \code{RollingLDA}
 object itself), the additional arguments \code{id, param, ...}
 may be used to override the specific elements.
 }
+\examples{
+\donttest{
+roll_lda = RollingLDA(texts = economy_texts,
+                      dates = economy_dates,
+                      chunks = "quarter",
+                      memory = "3 quarter",
+                      init = "2008-07-03",
+                      K = 10,
+                      type = "lda")
+
+is.RollingLDA(roll_lda, verbose = TRUE)
+getID(roll_lda)
+roll_lda = as.RollingLDA(roll_lda, id = "newID")
+getID(roll_lda)
+}
+
+}
 \seealso{
 Other RollingLDA functions: 
 \code{\link{RollingLDA}()},
