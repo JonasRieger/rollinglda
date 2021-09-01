@@ -1,10 +1,10 @@
 Package: rollinglda
 Type: Package
 Title: Construct Consistent Time Series from Textual Data
-Version: 0.0.1
-Date: 2021-08-05
+Version: 0.1.0
+Date: 2021-09-01
 Authors@R: person("Jonas", "Rieger", email="jonas.rieger@tu-dortmund.de", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-0007-4478"))
-Description: A rolling version of the Latent Dirichlet Allocation. By an sequential approach, it enables the construction of LDA-based time series of topics that are consistent with previous states of LDA models. After an initial modeling, updates can be computed efficiently, allowing for real-time monitoring and detection of events or structural breaks.
+Description: A rolling version of the Latent Dirichlet Allocation. By a sequential approach, it enables the construction of LDA-based time series of topics that are consistent with previous states of LDA models. After an initial modeling, updates can be computed efficiently, allowing for real-time monitoring and detection of events or structural breaks.
 URL: https://github.com/JonasRieger/rollinglda
 BugReports: https://github.com/JonasRieger/rollinglda/issues
 License: GPL (>= 3)
