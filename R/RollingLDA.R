@@ -97,7 +97,9 @@
 #' roll_lda
 #' getChunks(roll_lda)
 #' getLDA(roll_lda)
+#' }
 #'
+#' \dontrun{
 #' roll_proto = RollingLDA(texts = economy_texts,
 #'                         dates = economy_dates,
 #'                         chunks = "quarter",

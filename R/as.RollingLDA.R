@@ -221,7 +221,7 @@ is.RollingLDA = function(obj, verbose = FALSE){
     return(FALSE)
   }
   if (anyDuplicated(chunks$chunk.id)){
-    if (verbose) message("duplicated \" chunk.id\"")
+    if (verbose) message("duplicated \"chunk.id\"")
     return(FALSE)
   }
   if (!is.integer(chunks$chunk.id)){
@@ -245,27 +245,15 @@ is.RollingLDA = function(obj, verbose = FALSE){
     return(FALSE)
   }
   if (!is.Date(chunks$start.date)){
-    if (verbose) message("\"start.date\" is not an integer")
+    if (verbose) message("\"start.date\" is not a Date object")
     return(FALSE)
   }
   if (!is.Date(chunks$end.date)){
-    if (verbose) message("\"end.date\" is not an integer")
+    if (verbose) message("\"end.date\" is not a Date object")
     return(FALSE)
   }
   if (!is.Date(chunks$memory)){
-    if (verbose) message("\"memory\" is not an integer")
-    return(FALSE)
-  }
-  if (length(dates) != sum(chunks$n)){
-    if (verbose) message("sum of \"n\" does not match number of texts")
-    return(FALSE)
-  }
-  if (length(vocab) != max(chunks$n.vocab)){
-    if (verbose) message("sum of \"n.vocab\" does not match number of vocabularies")
-    return(FALSE)
-  }
-  if (is.unsorted(chunks$n.vocab)){
-    if (verbose) message("\"n.vocab\" is not monotonously increasing")
+    if (verbose) message("\"memory\" is not a Date object")
     return(FALSE)
   }
   if (any(is.na(chunks$chunk.id))){
@@ -286,6 +274,18 @@ is.RollingLDA = function(obj, verbose = FALSE){
   }
   if (any(is.na(chunks$end.date))){
     if (verbose) message("NA(s) in \"end.date\"")
+    return(FALSE)
+  }
+  if (length(dates) != sum(chunks$n)){
+    if (verbose) message("sum of \"n\" does not match number of texts")
+    return(FALSE)
+  }
+  if (length(vocab) != max(chunks$n.vocab)){
+    if (verbose) message("max of \"n.vocab\" does not match number of vocabularies")
+    return(FALSE)
+  }
+  if (is.unsorted(chunks$n.vocab)){
+    if (verbose) message("\"n.vocab\" is not monotonously increasing")
     return(FALSE)
   }
   if (min(dates) < min(chunks$start.date)){

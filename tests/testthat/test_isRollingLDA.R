@@ -123,6 +123,114 @@ test_that("various messages", {
   expect_message(is.RollingLDA(tmp, verbose = TRUE), "Must be of type 'character'")
 
   # chunks
+  tmp = roll_lda
+  tmp$chunks = list()
+  expect_false(is.RollingLDA(tmp))
+  expect_message(is.RollingLDA(tmp, verbose = TRUE), "not a data.table with standard parameters")
+
+  tmp = roll_lda
+  tmp$chunks = getChunks(tmp)[, -"chunk.id"]
+  expect_false(is.RollingLDA(tmp))
+  expect_message(is.RollingLDA(tmp, verbose = TRUE), "not a data.table with standard parameters")
+
+  # chunk.id
+  tmp = roll_lda
+  tmp$chunks$chunk.id[2] = tmp$chunks$chunk.id[1]
+  expect_false(is.RollingLDA(tmp))
+  expect_message(is.RollingLDA(tmp, verbose = TRUE), "duplicated \"chunk.id\"")
+
+  tmp = roll_lda
+  tmp$chunks$chunk.id[1] = 0
+  expect_false(is.RollingLDA(tmp))
+  expect_message(is.RollingLDA(tmp, verbose = TRUE), "\"chunk.id\" is not an integer")
+
+  tmp = roll_lda
+  tmp$chunks$chunk.id[1] = NA_integer_
+  expect_false(is.RollingLDA(tmp))
+  expect_message(is.RollingLDA(tmp, verbose = TRUE), "NA\\(s\\) in \"chunk.id\"")
+
+  # n
+  tmp = roll_lda
+  tmp$chunks$n[1] = 0
+  expect_false(is.RollingLDA(tmp))
+  expect_message(is.RollingLDA(tmp, verbose = TRUE), "\"n\" is not an integer")
+
+  tmp = roll_lda
+  tmp$chunks$n[1] = NA_integer_
+  expect_false(is.RollingLDA(tmp))
+  expect_message(is.RollingLDA(tmp, verbose = TRUE), "NA\\(s\\) in \"n\"")
+
+  # n.discarded
+  tmp = roll_lda
+  tmp$chunks$n.discarded[1] = 0
+  expect_false(is.RollingLDA(tmp))
+  expect_message(is.RollingLDA(tmp, verbose = TRUE), "\"n.discarded\" is not an integer")
+
+  # n.memory
+  tmp = roll_lda
+  tmp$chunks$n.memory[1] = 0
+  expect_false(is.RollingLDA(tmp))
+  expect_message(is.RollingLDA(tmp, verbose = TRUE), "\"n.memory\" is not an integer")
+
+  # n.vocab
+  tmp = roll_lda
+  tmp$chunks$n.vocab[1] = 0
+  expect_false(is.RollingLDA(tmp))
+  expect_message(is.RollingLDA(tmp, verbose = TRUE), "\"n.vocab\" is not an integer")
+
+  tmp = roll_lda
+  tmp$chunks$n.vocab[1] = NA_integer_
+  expect_false(is.RollingLDA(tmp))
+  expect_message(is.RollingLDA(tmp, verbose = TRUE), "NA\\(s\\) in \"n.vocab\"")
+
+  tmp = roll_lda
+  tmp$vocab = c(getVocab(roll_lda), "ABC")
+  expect_false(is.RollingLDA(tmp))
+  expect_message(is.RollingLDA(tmp, verbose = TRUE),
+                 "max of \"n.vocab\" does not match number of vocabularies")
+
+  tmp = roll_lda
+  tmp$chunks$n.vocab = rev(tmp$chunks$n.vocab)
+  expect_false(is.RollingLDA(tmp))
+  expect_message(is.RollingLDA(tmp, verbose = TRUE),
+                 "\"n.vocab\" is not monotonously increasing")
+
+  # start.date
+  tmp = roll_lda
+  tmp$chunks$start.date = as.character(tmp$chunks$start.date)
+  expect_false(is.RollingLDA(tmp))
+  expect_message(is.RollingLDA(tmp, verbose = TRUE), "\"start.date\" is not a Date object")
+
+  tmp = roll_lda
+  tmp$chunks$start.date[1] = NA_Date_
+  expect_false(is.RollingLDA(tmp))
+  expect_message(is.RollingLDA(tmp, verbose = TRUE), "NA\\(s\\) in \"start.date\"")
+
+  tmp = roll_lda
+  tmp$chunks$start.date[1] = as.character(Sys.Date())
+  expect_false(is.RollingLDA(tmp))
+  expect_message(is.RollingLDA(tmp, verbose = TRUE),
+                 "minimum of \"start.date\" is larger than minimum of text's dates")
+
+  # end.date
+  tmp = roll_lda
+  tmp$chunks$end.date = as.character(tmp$chunks$end.date)
+  expect_false(is.RollingLDA(tmp))
+  expect_message(is.RollingLDA(tmp, verbose = TRUE), "\"end.date\" is not a Date object")
+
+  tmp = roll_lda
+  tmp$chunks$end.date[1] = NA_Date_
+  expect_false(is.RollingLDA(tmp))
+  expect_message(is.RollingLDA(tmp, verbose = TRUE), "NA\\(s\\) in \"end.date\"")
+
+  # memory
+  tmp = roll_lda
+  tmp$chunks$memory = as.character(tmp$chunks$memory)
+  expect_false(is.RollingLDA(tmp))
+  expect_message(is.RollingLDA(tmp, verbose = TRUE), "\"memory\" is not a Date object")
+
+
+
 
   # param
 
