@@ -223,15 +223,43 @@ test_that("various messages", {
   expect_false(is.RollingLDA(tmp))
   expect_message(is.RollingLDA(tmp, verbose = TRUE), "NA\\(s\\) in \"end.date\"")
 
+  tmp = roll_lda
+  tmp$chunks$end.date[nrow(getChunks(tmp))] = tmp$chunks$end.date[nrow(getChunks(tmp))]-1
+  expect_false(is.RollingLDA(tmp))
+  expect_message(is.RollingLDA(tmp, verbose = TRUE),
+                 "maximum of \"end.date\" is smaller than maximum of text's dates")
+
   # memory
   tmp = roll_lda
   tmp$chunks$memory = as.character(tmp$chunks$memory)
   expect_false(is.RollingLDA(tmp))
   expect_message(is.RollingLDA(tmp, verbose = TRUE), "\"memory\" is not a Date object")
 
-
-
-
   # param
+  tmp = roll_lda
+  tmp$param = getParam(roll_lda)[-1]
+  expect_false(is.RollingLDA(tmp))
+  expect_message(is.RollingLDA(tmp, verbose = TRUE),
+                 "Must be equal to set \\{'vocab.abs','vocab.rel','vocab.fallback','doc.abs'\\}")
+
+  tmp = roll_lda
+  tmp$param$vocab.abs = -1
+  expect_false(is.RollingLDA(tmp))
+  expect_message(is.RollingLDA(tmp, verbose = TRUE), "\"vocab.abs\" is smaller than 0")
+
+  tmp = roll_lda
+  tmp$param$vocab.rel = -1
+  expect_false(is.RollingLDA(tmp))
+  expect_message(is.RollingLDA(tmp, verbose = TRUE), "\"vocab.rel\" is smaller than 0")
+
+  tmp = roll_lda
+  tmp$param$vocab.fallback = -1
+  expect_false(is.RollingLDA(tmp))
+  expect_message(is.RollingLDA(tmp, verbose = TRUE), "\"vocab.fallback\" is smaller than 0")
+
+  tmp = roll_lda
+  tmp$param$doc.abs = -1
+  expect_false(is.RollingLDA(tmp))
+  expect_message(is.RollingLDA(tmp, verbose = TRUE), "\"doc.abs\" is smaller than 0")
 
 })
