@@ -12,7 +12,7 @@ RollingLDA is a rolling version of the Latent Dirichlet Allocation. By a sequent
 Please cite the package using the BibTeX entry, which is obtained by the call ``citation("rollinglda")``.
 
 ## References
-* TBA
+* Rieger, J., Jentsch, C. & Rahnenführer, J. (2021). RollingLDA: An Update Algorithm of Latent Dirichlet Allocation to Construct Consistent Time Series from Textual Data. Accepted for [Findings of EMNLP 2021](https://www.statistik.tu-dortmund.de/fileadmin/user_upload/Lehrstuehle/IWuS/Forschung/rollinglda.pdf).
 
 ## Related Software
 * [tm](https://CRAN.R-project.org/package=tm) is useful for preprocessing text data.
