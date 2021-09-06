@@ -50,7 +50,6 @@
 #' @return [\code{named list}] \code{\link{RollingLDA}} object.
 #'
 #' @examples
-#' \donttest{
 #' roll_lda = RollingLDA(texts = economy_texts,
 #'                       dates = economy_dates,
 #'                       chunks = "quarter",
@@ -63,7 +62,6 @@
 #' getID(roll_lda)
 #' roll_lda = as.RollingLDA(roll_lda, id = "newID")
 #' getID(roll_lda)
-#' }
 #'
 #' @export as.RollingLDA
 as.RollingLDA = function(x, id, lda, docs, dates, vocab, chunks, param){

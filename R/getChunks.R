@@ -15,6 +15,7 @@
 #' See \code{\link[ldaPrototype:getSCLOP]{getLDA}}
 #' @param all not implemented for \code{\link{RollingLDA}} object.
 #' See \code{\link[ldaPrototype:getSCLOP]{getLDA}}
+#' @return The requested element of a \code{\link{RollingLDA}} object.
 #'
 #' @family RollingLDA functions
 

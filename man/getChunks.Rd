@@ -46,6 +46,9 @@ See \code{\link[ldaPrototype:getSCLOP]{getLDA}}}
 \item{all}{not implemented for \code{\link{RollingLDA}} object.
 See \code{\link[ldaPrototype:getSCLOP]{getLDA}}}
 }
+\value{
+The requested element of a \code{\link{RollingLDA}} object.
+}
 \description{
 Returns the corresponding element of a \code{\link{RollingLDA}} object.
 }

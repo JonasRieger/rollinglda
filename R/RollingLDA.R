@@ -85,7 +85,6 @@
 #' }
 #'
 #' @examples
-#' \donttest{
 #' roll_lda = RollingLDA(texts = economy_texts,
 #'                       dates = economy_dates,
 #'                       chunks = "quarter",
@@ -97,9 +96,8 @@
 #' roll_lda
 #' getChunks(roll_lda)
 #' getLDA(roll_lda)
-#' }
 #'
-#' \dontrun{
+#' \donttest{
 #' roll_proto = RollingLDA(texts = economy_texts,
 #'                         dates = economy_dates,
 #'                         chunks = "quarter",
@@ -108,7 +106,7 @@
 #'                         K = 10,
 #'                         n = 12,
 #'                         pm.backend = "socket",
-#'                         ncpus = 4)
+#'                         ncpus = 2)
 #'
 #' roll_proto
 #' getChunks(roll_proto)
