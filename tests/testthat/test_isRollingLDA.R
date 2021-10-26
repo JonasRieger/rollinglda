@@ -27,13 +27,13 @@ test_that("various messages", {
   names(tmp)[names(tmp) == "id"] = "ID"
   expect_false(is.RollingLDA(tmp))
   expect_message(is.RollingLDA(tmp, verbose = TRUE),
-                 "Must be equal to set \\{'id','lda','docs','dates','vocab','chunks','param'\\}")
+                 "set \\{'id','lda','docs','dates','vocab','chunks','param'\\}")
 
   tmp = roll_lda
   tmp$lda = NULL
   expect_false(is.RollingLDA(tmp))
   expect_message(is.RollingLDA(tmp, verbose = TRUE),
-                 "Must be equal to set \\{'id','lda','docs','dates','vocab','chunks','param'\\}")
+                 "\\{'id','lda','docs','dates','vocab','chunks','param'\\}")
 
   # id
   tmp = roll_lda
@@ -240,7 +240,7 @@ test_that("various messages", {
   tmp$param = getParam(roll_lda)[-1]
   expect_false(is.RollingLDA(tmp))
   expect_message(is.RollingLDA(tmp, verbose = TRUE),
-                 "Must be equal to set \\{'vocab.abs','vocab.rel','vocab.fallback','doc.abs'\\}")
+                 "\\{'vocab.abs','vocab.rel','vocab.fallback','doc.abs'\\}")
 
   tmp = roll_lda
   tmp$param$vocab.abs = -1

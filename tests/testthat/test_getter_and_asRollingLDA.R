@@ -14,7 +14,7 @@ test_that("getter: inverse", {
 
   expect_identical(
     unname(getDates(roll_proto, getNames(roll_proto), inverse = TRUE)),
-    Date()
+    as.Date(double())
   )
 
   expect_identical(

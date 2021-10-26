@@ -46,3 +46,7 @@ unnamed-chunk-*.pdf
 # LaTeX
 *.aux
 *fdb_latexmk
+
+src/*.o
+src/*.so
+src/*.dll
