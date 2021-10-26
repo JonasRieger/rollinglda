@@ -197,7 +197,7 @@ test_that("init: date, ineger, character(date)", {
                       economy_dates[economy_dates >= mid & economy_dates <= chunk], memory = 20)
   expect_identical(getChunks(model1), getChunks(model2))
   expect_setequal(getVocab(model1), getVocab(model2))
-  expect_setequal(getDates(model1), getDates(model2))
+  expect_mapequal(getDates(model1), getDates(model2))
 
   # needed if chunks character
   expect_error(RollingLDA(economy_texts[economy_dates < mid], economy_dates[economy_dates < mid],
@@ -461,3 +461,4 @@ test_that("print.RollingLDA", {
     expect_output(print(roll_lda2), i, fixed = TRUE)
   }
 })
+
