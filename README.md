@@ -80,7 +80,7 @@ getChunks(roll_lda)
 ```
 It is noticeable that the ``start.date`` of the first chunk is not 4th July, 2008. This is due to the fact that there are no texts for this day. The table shows the actual minimum and maximum dates per chunk. From ``n.vocab`` one can see how the vocabulary of the model increases due to the (frequent enough, see parameters ``vocab.abs``, ``vocab.rel`` and ``vocab.fallback``) use of new words within the observation intervals.
 
-Mittels ``getLDA`` lässt sich ein `RollingLDA` Objekt in ein standard ``LDA`` Objekt umwandeln, das mittels vieler Funktionen aus den Paketen [ldaPrototype](https://github.com/JonasRieger/ldaPrototype) und [tosca](https://github.com/Docma-TU/tosca) weiterverarbeitet werden kann. Mittels ``getVocab`` lässt sich ebenso das gesamte Vokabular des Modells ausgeben.
+You can use ``getLDA`` to convert a `RollingLDA` object into a standard ``LDA`` object, which can be further processed using several functions from the [ldaPrototype](https://github.com/JonasRieger/ldaPrototype) and [tosca](https://github.com/Docma-TU/tosca) packages. You can also use ``getVocab`` to get the entire vocabulary of the model.
 ```{R}
 roll_lda
 # RollingLDA Object named "rolling-lda" with elements
