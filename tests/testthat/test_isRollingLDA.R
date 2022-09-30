@@ -84,7 +84,9 @@ test_that("various messages", {
   expect_message(is.RollingLDA(tmp, verbose = TRUE), "Contains missing values")
 
   tmp = roll_lda
-  tmp$dates = as.character(tmp$dates)
+  tmp_dates = as.character(tmp$dates)
+  names(tmp_dates) = names(tmp$dates) # only for fedora...
+  tmp$dates = tmp_dates
   expect_false(is.RollingLDA(tmp))
   expect_message(is.RollingLDA(tmp, verbose = TRUE), "Must be of class 'Date'")
 
