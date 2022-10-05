@@ -25,8 +25,8 @@
 #' @references
 #' Rieger, Jonas, Carsten Jentsch and Jörg Rahnenführer (2021).
 #' "RollingLDA: An Update Algorithm of Latent Dirichlet Allocation to Construct
-#' Consistent Time Series from Textual Data". Accepted for \emph{Findings of EMNLP 2021}.
-#' URL \url{https://www.statistik.tu-dortmund.de/fileadmin/user_upload/Lehrstuehle/IWuS/Forschung/rollinglda.pdf}.
+#' Consistent Time Series from Textual Data". \emph{EMNLP Findings 2021}.
+#' URL \doi{10.18653/v1/2021.findings-emnlp.201}.
 #'
 #' @import data.table
 #' @import checkmate
