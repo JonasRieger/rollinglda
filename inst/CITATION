@@ -3,7 +3,7 @@ citHeader("To cite rollinglda in publications use:")
 year = sub(".*(2[[:digit:]]{3})-.*", "\\1", meta$Date)
 vers = paste("R package version", meta$Version)
 
-citEntry(entry = "Manual",
+bibentry(bibtype = "Manual",
   title        = "{rollinglda}: Construct Consistent Time Series from Textual Data",
   author       = "Jonas Rieger",
   year         = year,
