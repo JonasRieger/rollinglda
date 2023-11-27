@@ -143,7 +143,7 @@ SEXP ldagibbs(SEXP documents,
     // und speichere zusaetzlich in zs
     SEXP zs = VECTOR_ELT(assignments, dd);
     if (!zs) {
-      error("Unable to allocate memory for document (%d) assignments", dd);
+      error("Unable to allocate memory for document (%ld) assignments", dd);
     }
 
     for (ww = 0; ww < nw; ++ww) {
