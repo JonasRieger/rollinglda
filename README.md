@@ -5,6 +5,8 @@
 [![codecov](https://codecov.io/gh/JonasRieger/rollinglda/branch/main/graph/badge.svg?token=6BM1Z3A2D8)](https://app.codecov.io/gh/JonasRieger/rollinglda)
 [![DOI](https://zenodo.org/badge/392967136.svg)](https://zenodo.org/badge/latestdoi/392967136)
 
+This is the repository of the (original) **R implementation** of RollingLDA. For the **Python implementation** please have a look at the [ttta package](https://github.com/K-RLange/ttta).
+
 ## Construct Consistent Time Series from Textual Data
 RollingLDA is a rolling version of the Latent Dirichlet Allocation. By a sequential approach, it enables the construction of LDA-based time series of topics that are consistent with previous states of LDA models. After an initial modeling, updates can be computed efficiently, allowing for real-time monitoring and detection of events or structural breaks.
 
